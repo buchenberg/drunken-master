@@ -15,9 +15,11 @@
         "hapi": "^16.1.1",
         "hapi-swaggered-ui": "^2.6.0",
         "inert": "^4.1.0",
+        "nano": "^6.4.0",
         "swaggerize-hapi": "^2.0.1",
         "swaggerize-routes": "github:buchenberg/swaggerize-routes",
         "swagmock": "github:buchenberg/swagmock",
+        "uuid": "^3.1.0",
         "vision": "^4.1.1"
     },
     "devDependencies": {

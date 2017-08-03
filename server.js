@@ -6,6 +6,10 @@ const debug = require('debug')('server');
 const fs = require('fs');
 const chalk = require('chalk');
 
+const nano = require('nano')('http://localhost:5984');
+const db = nano.use('alice');
+// const swagger = require('./modules/mocks/config/swagger.json');
+
 let tls = false;
 
 
@@ -26,7 +30,7 @@ const environment = {
         upstream_protocol: process.env.PROXY_UPSTREAM_PROTOCOL,
         header_host: process.env.PROXY_HEADER_HOST
     }
-        
+
 };
 
 const manifest = {
@@ -60,10 +64,15 @@ const manifest = {
         },
         {
             plugin: {
-                register: './modules/toast',
+                register: './modules/mocks',
                 options: {
-                    api: Path.resolve('./modules/toast/config/swagger.json'),
-                    baseDir: Path.resolve('./modules/toast'),
+                    db: {
+                        host: 'localhost',
+                        port: '5984',
+                        name: 'alice',
+                        oas: 'swagger'
+                    },
+                    baseDir: Path.resolve('./modules/mocks'),
                     docspath: '/swagger'
                 }
             }
@@ -74,7 +83,7 @@ const manifest = {
                 options: {
                     swaggerEndpoint: '/v1/swagger',
                     path: '/swagger-ui',
-                    title: 'Powdered Toast',
+                    title: 'Drunken Master',
                     swaggerOptions: {}
                 }
             }
@@ -91,7 +100,7 @@ Glue.compose(manifest, options, (err, server) => {
         throw err;
     }
     server.start(() => {
-        server.plugins.toast.setHost(server.info.host + ':' + server.info.port);
+        server.plugins.mocks.setHost(server.info.host + ':' + server.info.port);
         debug(`Swagger UI is running on ${chalk.cyan(chalk.underline(server.info.uri + '/swagger-ui'))}`);
     });
 });

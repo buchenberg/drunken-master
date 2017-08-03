@@ -1,13 +1,11 @@
 'use strict';
-var Swagmock = require('swagmock');
-var Path = require('path');
-var apiPath = Path.resolve(__dirname, '../config/swagger.json');
-var mockgen;
+const Swagmock = require('swagmock');
+let mockgen;
 
-module.exports = function () {
+module.exports = function (swagger) {
     /**
      * Cached mock generator
      */
-    mockgen = mockgen || Swagmock(apiPath);
+    mockgen = mockgen || Swagmock(swagger);
     return mockgen;
 };

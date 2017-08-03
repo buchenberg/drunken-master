@@ -8,85 +8,99 @@ var Yaml = require('js-yaml');
 var Fs = require('fs');
 var Mockgen = require('./lib/mockgen.js');
 
+var Swagmock = require('swagmock');
+
+
+
+
+
 module.exports = {
     register: function (server, options, next) {
         var routes, basePath;
 
         Assert.ok(Thing.isObject(options), 'Expected options to be an object.');
-        Assert.ok(options.api, 'Expected an api definition.');
-
-        if (Thing.isString(options.api)) {
-            options.api = loadApi(options.api);
-        }
-
-        Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
-
+        const dbURL = `http://${options.db.host}:${options.db.port}`;
+        debug('dbURL', dbURL);
+        const nano = require('nano')(dbURL);
+        const db = nano.use(options.db.name);
         options.basedir = options.basedir || process.cwd();
         options.docspath = Utils.prefix(options.docspath || '/api-docs', '/');
-        options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
-        basePath = Utils.unsuffix(options.api.basePath, '/');
 
-        const defaulthandler = function (request, reply) {
-            let status = 200;
-            let path = request.route.path.replace(options.api.basePath, '');
-            let mockOptions = {
-                path: path,
-                operation: request.method,
-                response: status
+
+
+        db.get('swagger', function (err, body) {
+            options.api = body.spec;
+            if (Thing.isString(options.api)) {
+                options.api = loadApi(options.api);
+            }
+
+            Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
+
+            options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
+            basePath = Utils.unsuffix(options.api.basePath, '/');
+
+            const defaulthandler = function (request, reply) {
+                let status = 200;
+                let path = request.route.path.replace(options.api.basePath, '');
+                let mockOptions = {
+                    path: path,
+                    operation: request.method,
+                    response: status
+                };
+                debug('mock options', mockOptions);
+
+                let responseMock = Mockgen(options.api).responses(mockOptions);
+                responseMock.then(mock => {
+                    reply(mock);
+                }).catch(error => {
+                    reply({ 'drunken-master-error': error }).status(599);
+                });
             };
-            debug('mock options', mockOptions);
 
-            let responseMock = Mockgen().responses(mockOptions);
-            responseMock.then( mock => {
-                reply(mock);
-            }).catch(error => {
-                next(error);
-                return;
+            //Build routes
+            routes = builder({
+                'baseDir': options.baseDir,
+                'api': options.api,
+                'schema-extensions': true,
+                'defaulthandler': defaulthandler
             });
-        };
 
-        //Build routes
-        routes = builder({
-            'baseDir': options.baseDir,
-            'api': options.api,
-            'schema-extensions': true,
-            'defaulthandler': defaulthandler
-        });
-
-        //API docs route
-        server.route({
-            method: 'GET',
-            path: basePath + options.docspath,
-            config: {
-                handler: function (request, reply) {
-                    reply(options.api);
-                },
-                cors: options.cors
-            },
-            vhost: options.vhost
-        });
-
-        //Add all known routes
-        routes.forEach(function (route) {
-            //Define the route
+            //API docs route
             server.route({
-                method: route.method,
-                path: basePath + route.path,
-                handler: route.handler,
+                method: 'GET',
+                path: basePath + options.docspath,
+                config: {
+                    handler: function (request, reply) {
+                        reply(options.api);
+                    },
+                    cors: options.cors
+                },
                 vhost: options.vhost
             });
-        });
 
-        //Expose plugin api
-        server.expose({
-            api: options.api,
-            setHost: function setHost(host) {
-                this.api.host = options.api.host = host;
-            }
-        });
+            //Add all known routes
+            routes.forEach(function (route) {
+                //Define the route
+                server.route({
+                    method: route.method,
+                    path: basePath + route.path,
+                    handler: route.handler,
+                    vhost: options.vhost
+                });
+            });
 
-        //Done
-        next();
+            //Expose plugin api
+            server.expose({
+                api: options.api,
+                setHost: function setHost(host) {
+                    this.api.host = options.api.host = host;
+                }
+            });
+
+            //Done
+            next();
+
+        });
     }
 };
 
