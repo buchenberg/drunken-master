@@ -1,0 +1,40 @@
+{
+    "name": "drunken-master",
+    "description": "",
+    "version": "1.0.0",
+    "author": "Gregory Buchenberger buchenberger@gmail.com",
+    "dependencies": {
+        "async": "^2.5.0",
+        "blipp": "^2.3.0",
+        "core-util-is": "^1.0.2",
+        "debug": "^2.6.0",
+        "debuglog": "^1.0.1",
+        "dotenv": "^4.0.0",
+        "glue": "^4.1.0",
+        "h2o2": "^5.4.0",
+        "hapi": "^16.1.1",
+        "hapi-swaggered-ui": "^2.6.0",
+        "inert": "^4.1.0",
+        "swaggerize-hapi": "^2.0.1",
+        "swagmock": "github:buchenberg/swagmock",
+        "vision": "^4.1.1"
+    },
+    "devDependencies": {
+        "dredd": "^3.4.3",
+        "eslint": "^3.19.0",
+        "generator-powdered-toast": "^1.0.0",
+        "is-my-json-valid": "^2.13.1",
+        "istanbul": "~0.4.3",
+        "js-yaml": "^3.9.1",
+        "supertest": "^1.2.0",
+        "swagger-parser": "^3.4.1",
+        "tape": "^4"
+    },
+    "scripts": {
+        "start": "node server.js",
+        "test": "npm run dredd",
+        "dredd": "dredd",
+        "lint": "eslint ."
+    },
+    "main": "./server"
+}
