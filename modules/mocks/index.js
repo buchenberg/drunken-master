@@ -1,5 +1,5 @@
 'use strict';
-const debug = require('debug')('toast');
+const debug = require('debug');
 var Assert = require('assert');
 var Thing = require('core-util-is');
 var builder = require('swaggerize-routes');
@@ -8,7 +8,9 @@ var Yaml = require('js-yaml');
 var Fs = require('fs');
 var Mockgen = require('./lib/mockgen.js');
 
-var Swagmock = require('swagmock');
+const error = debug('index:error');
+const log = debug('index:log');
+log.log = console.log.bind(console);
 
 
 
@@ -20,16 +22,37 @@ module.exports = {
 
         Assert.ok(Thing.isObject(options), 'Expected options to be an object.');
         const dbURL = `http://${options.db.host}:${options.db.port}`;
-        debug('dbURL', dbURL);
+        log('dbURL: ', dbURL);
         const nano = require('nano')(dbURL);
         const db = nano.use(options.db.name);
         options.basedir = options.basedir || process.cwd();
         options.docspath = Utils.prefix(options.docspath || '/api-docs', '/');
 
+        db.update = function (obj, key, callback) {
+            var db = this;
+            db.get(key, function (error, existing) {
+                if (!error) obj._rev = existing._rev;
+                db.insert(obj, key, callback);
+            });
+        };
+
+        // db.update({ title: 'The new one' }, '1', function (err, res) {
+        //     if (err) return console.log('No update!');
+        //     console.log('Updated!');
+        // });
 
 
-        db.get('swagger', function (err, body) {
-            options.api = body.spec;
+
+        db.get(options.db.document, function (err, body) {
+            if (body && body.spec) {
+                log('Spec found!');
+                options.api = body.spec;
+
+            } else {
+                error('No spec found! Check your DB.');
+                return;
+            }
+
             if (Thing.isString(options.api)) {
                 options.api = loadApi(options.api);
             }
@@ -47,13 +70,13 @@ module.exports = {
                     operation: request.method,
                     response: status
                 };
-                debug('mock options', mockOptions);
+                log('mock options', mockOptions);
 
                 let responseMock = Mockgen(options.api).responses(mockOptions);
                 responseMock.then(mock => {
                     reply(mock);
                 }).catch(error => {
-                    reply({ 'drunken-master-error': error }).status(599);
+                    reply({ 'drunken-master-error': error });
                 });
             };
 
@@ -68,10 +91,57 @@ module.exports = {
             //API docs route
             server.route({
                 method: 'GET',
-                path: basePath + options.docspath,
+                path: options.docspath,
                 config: {
                     handler: function (request, reply) {
-                        reply(options.api);
+                        db.get(options.db.document, function (err, res) {
+                            if (err) {
+                                error('No update! ', err);
+                                reply({error: err});
+                            }
+                            log('Got it!');
+                            reply(res.spec);
+                        });
+                    },
+                    cors: options.cors
+                },
+                vhost: options.vhost
+            });
+
+            // OAS Routes
+            server.route({
+                method: 'PUT',
+                path: '/oas',
+                config: {
+                    handler: function (request, reply) {
+                        db.update({
+                            spec: request.payload
+                        }, 'swagger', function (err, res) {
+                            if (err) {
+                                error('No update! ', err);
+                                reply({error: err});
+                            }
+                            log('Updated!', res);
+                            reply(res);
+                        });
+                    },
+                    cors: options.cors
+                },
+                vhost: options.vhost
+            });
+            server.route({
+                method: 'GET',
+                path: '/oas',
+                config: {
+                    handler: function (request, reply) {
+                        db.get(options.db.document, function (err, res) {
+                            if (err) {
+                                error('No update! ', err);
+                                reply({error: err});
+                            }
+                            log('Got it!');
+                            reply(res.spec);
+                        });
                     },
                     cors: options.cors
                 },

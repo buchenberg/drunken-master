@@ -3,12 +3,7 @@ require('dotenv').config();
 const Glue = require('glue');
 const Path = require('path');
 const debug = require('debug')('server');
-const fs = require('fs');
-const chalk = require('chalk');
-
-const nano = require('nano')('http://localhost:5984');
-const db = nano.use('alice');
-// const swagger = require('./modules/mocks/config/swagger.json');
+const Chalk = require('chalk');
 
 let tls = false;
 
@@ -70,7 +65,7 @@ const manifest = {
                         host: 'localhost',
                         port: '5984',
                         name: 'alice',
-                        oas: 'swagger'
+                        document: 'swagger'
                     },
                     baseDir: Path.resolve('./modules/mocks'),
                     docspath: '/swagger'
@@ -81,7 +76,7 @@ const manifest = {
             plugin: {
                 register: 'hapi-swaggered-ui',
                 options: {
-                    swaggerEndpoint: '/v1/swagger',
+                    swaggerEndpoint: '/oas',
                     path: '/swagger-ui',
                     title: 'Drunken Master',
                     swaggerOptions: {}
@@ -101,6 +96,6 @@ Glue.compose(manifest, options, (err, server) => {
     }
     server.start(() => {
         server.plugins.mocks.setHost(server.info.host + ':' + server.info.port);
-        debug(`Swagger UI is running on ${chalk.cyan(chalk.underline(server.info.uri + '/swagger-ui'))}`);
+        debug(`Swagger UI is running on ${Chalk.cyan(Chalk.underline(server.info.uri + '/swagger-ui'))}`);
     });
 });
