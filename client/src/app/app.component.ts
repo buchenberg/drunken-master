@@ -1,6 +1,8 @@
-import { Component, ViewChild, AfterViewInit } from '@angular/core';
-import { Http } from '@angular/http';
+import { Component, OnInit } from '@angular/core';
+// import { Observable } from "rxjs/Observable";
+import { HttpClient } from "@angular/common/http";
 import { AceEditorComponent } from 'ng2-ace-editor';
+import 'rxjs/add/operator/map'
 import 'brace';
 import 'brace/theme/clouds';
 import 'brace/mode/json';
@@ -10,14 +12,35 @@ import 'brace/mode/json';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   myData: Array<any>;
   title = 'Drunken Master';
-  content = JSON.stringify(this.myData);
-  // constructor(private http:Http) {
-  //   this.http.get('https://jsonplaceholder.typicode.com/photos')
-  //     .map(response => response.json())
-  //     .subscribe(res => this.myData = res);
+  content = '';
+  oasUrl = 'http://localhost:9990/swagger';
+  oasUpdateUrl = 'http://localhost:9990/oas'
 
-  // }
+  constructor(private http:HttpClient) {
+  }
+
+  updateOAS(oas) {
+    localStorage.setItem('oas', JSON.stringify(oas, null, 2))
+    this.content = JSON.stringify(oas, null, 2)
+  }
+
+  onClickSave() {
+    this.http
+      .put(this.oasUpdateUrl, this.content)
+      .subscribe(result =>
+        console.log(result)
+      )
+  }
+
+  
+
+  ngOnInit() {
+    this.http.get(this.oasUrl)
+      .subscribe(result =>
+        this.updateOAS(result)
+      )
+  }
 }

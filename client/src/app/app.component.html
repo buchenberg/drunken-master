@@ -5,13 +5,13 @@
   </md-toolbar>
   <md-card>
     <md-card-header>
-      <md-card-title>Ace.</md-card-title>
+      <md-card-title>OAS</md-card-title>
     </md-card-header>
     <ace-editor #editor [(text)]="content" [mode]="'json'">
     </ace-editor>
     <md-card-actions>
-      <button md-button>LIKE</button>
-      <button md-button>SHARE</button>
+      <button md-button (click)="onClickSave()">Save</button>
+      <button md-button>Cancel</button>
     </md-card-actions>
 
   </md-card>

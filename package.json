@@ -35,7 +35,9 @@
     },
     "scripts": {
         "start": "node server.js",
-        "client": "cd client && ng serve",
+        "build:client": "cd client && ng build",
+        "postbuild:client": "cp -rv client/dist/* modules/public",
+        "serve:client": "cd client && ng serve",
         "test": "npm run dredd",
         "dredd": "dredd",
         "lint": "eslint ."

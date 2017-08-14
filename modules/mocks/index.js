@@ -1,5 +1,6 @@
 'use strict';
 const debug = require('debug');
+const Path = require('path');
 var Assert = require('assert');
 var Thing = require('core-util-is');
 var builder = require('swaggerize-routes');
@@ -55,6 +56,25 @@ module.exports = {
             if (options.api.hasOwnProperty('basePath')) {
                 options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
                 basePath = Utils.unsuffix(options.api.basePath, '/');
+
+                const defaulthandler = function (request, reply) {
+                    let status = 200;
+                    let path = request.route.path.replace(options.api.basePath, '');
+                    let mockOptions = {
+                        path: path,
+                        operation: request.method,
+                        response: status
+                    };
+                    log('mock options', mockOptions);
+
+                    let responseMock = Mockgen(options.api).responses(mockOptions);
+                    responseMock.then(mock => {
+                        reply(mock);
+                    }).catch(error => {
+                        reply({ 'drunken-master-error': error });
+                    });
+                };
+
                 //Build routes
                 routes = builder({
                     'baseDir': options.baseDir,
@@ -62,6 +82,7 @@ module.exports = {
                     'schema-extensions': true,
                     'defaulthandler': defaulthandler
                 });
+
                 //Add all known routes
                 routes.forEach(function (route) {
                     //Define the route
@@ -76,34 +97,17 @@ module.exports = {
                 options.api.basePath = '/';
             }
 
-            // options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
-            // basePath = Utils.unsuffix(options.api.basePath, '/');
+            // UI route
+            server.route({
+                method: 'GET',
+                path: '/{param*}',
+                handler: {
+                    directory: {
+                        path: 'modules/public'
+                    }
+                }
+            });
 
-            const defaulthandler = function (request, reply) {
-                let status = 200;
-                let path = request.route.path.replace(options.api.basePath, '');
-                let mockOptions = {
-                    path: path,
-                    operation: request.method,
-                    response: status
-                };
-                log('mock options', mockOptions);
-
-                let responseMock = Mockgen(options.api).responses(mockOptions);
-                responseMock.then(mock => {
-                    reply(mock);
-                }).catch(error => {
-                    reply({ 'drunken-master-error': error });
-                });
-            };
-
-            //Build routes
-            // routes = builder({
-            //     'baseDir': options.baseDir,
-            //     'api': options.api,
-            //     'schema-extensions': true,
-            //     'defaulthandler': defaulthandler
-            // });
 
             //API docs route
             server.route({

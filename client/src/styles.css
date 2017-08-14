@@ -3,7 +3,7 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
 .ace_editor {
-    min-height: 200px; 
+    min-height: 1000px; 
     width:100%; 
     overflow: auto;
 }
