@@ -36,13 +36,6 @@ module.exports = {
             });
         };
 
-        // db.update({ title: 'The new one' }, '1', function (err, res) {
-        //     if (err) return console.log('No update!');
-        //     console.log('Updated!');
-        // });
-
-
-
         db.get(options.db.document, function (err, body) {
             if (body && body.spec) {
                 log('Spec found!');
@@ -50,17 +43,41 @@ module.exports = {
 
             } else {
                 error('No spec found! Check your DB.');
-                return;
+                options.api = {};
+                //return;
             }
 
             if (Thing.isString(options.api)) {
                 options.api = loadApi(options.api);
             }
 
-            Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
+            // Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
+            if (options.api.hasOwnProperty('basePath')) {
+                options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
+                basePath = Utils.unsuffix(options.api.basePath, '/');
+                //Build routes
+                routes = builder({
+                    'baseDir': options.baseDir,
+                    'api': options.api,
+                    'schema-extensions': true,
+                    'defaulthandler': defaulthandler
+                });
+                //Add all known routes
+                routes.forEach(function (route) {
+                    //Define the route
+                    server.route({
+                        method: route.method,
+                        path: basePath + route.path,
+                        handler: route.handler,
+                        vhost: options.vhost
+                    });
+                });
+            } else {
+                options.api.basePath = '/';
+            }
 
-            options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
-            basePath = Utils.unsuffix(options.api.basePath, '/');
+            // options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
+            // basePath = Utils.unsuffix(options.api.basePath, '/');
 
             const defaulthandler = function (request, reply) {
                 let status = 200;
@@ -81,12 +98,12 @@ module.exports = {
             };
 
             //Build routes
-            routes = builder({
-                'baseDir': options.baseDir,
-                'api': options.api,
-                'schema-extensions': true,
-                'defaulthandler': defaulthandler
-            });
+            // routes = builder({
+            //     'baseDir': options.baseDir,
+            //     'api': options.api,
+            //     'schema-extensions': true,
+            //     'defaulthandler': defaulthandler
+            // });
 
             //API docs route
             server.route({
@@ -97,7 +114,7 @@ module.exports = {
                         db.get(options.db.document, function (err, res) {
                             if (err) {
                                 error('No update! ', err);
-                                reply({error: err});
+                                reply({ error: err });
                             }
                             log('Got it!');
                             reply(res.spec);
@@ -116,10 +133,10 @@ module.exports = {
                     handler: function (request, reply) {
                         db.update({
                             spec: request.payload
-                        }, 'swagger', function (err, res) {
+                        }, options.db.document, function (err, res) {
                             if (err) {
                                 error('No update! ', err);
-                                reply({error: err});
+                                reply({ error: err });
                             }
                             log('Updated!', res);
                             reply(res);
@@ -137,7 +154,7 @@ module.exports = {
                         db.get(options.db.document, function (err, res) {
                             if (err) {
                                 error('No update! ', err);
-                                reply({error: err});
+                                reply({ error: err });
                             }
                             log('Got it!');
                             reply(res.spec);
@@ -149,15 +166,15 @@ module.exports = {
             });
 
             //Add all known routes
-            routes.forEach(function (route) {
-                //Define the route
-                server.route({
-                    method: route.method,
-                    path: basePath + route.path,
-                    handler: route.handler,
-                    vhost: options.vhost
-                });
-            });
+            // routes.forEach(function (route) {
+            //     //Define the route
+            //     server.route({
+            //         method: route.method,
+            //         path: basePath + route.path,
+            //         handler: route.handler,
+            //         vhost: options.vhost
+            //     });
+            // });
 
             //Expose plugin api
             server.expose({

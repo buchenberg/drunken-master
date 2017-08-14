@@ -64,8 +64,8 @@ const manifest = {
                     db: {
                         host: 'localhost',
                         port: '5984',
-                        name: 'alice',
-                        document: 'swagger'
+                        name: 'oas',
+                        document: 'spec'
                     },
                     baseDir: Path.resolve('./modules/mocks'),
                     docspath: '/swagger'

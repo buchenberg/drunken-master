@@ -35,6 +35,7 @@
     },
     "scripts": {
         "start": "node server.js",
+        "client": "cd client && ng serve",
         "test": "npm run dredd",
         "dredd": "dredd",
         "lint": "eslint ."
