@@ -9,6 +9,11 @@ let tls = false;
 
 
 const environment = {
+    db: {
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT || 5984,
+        name: process.env.DB_NAME || 'oas'
+    },
     api: {
         host: process.env.API_HOST || 'localhost',
         port: process.env.API_PORT || 9990
@@ -62,9 +67,9 @@ const manifest = {
                 register: './modules/mocks',
                 options: {
                     db: {
-                        host: 'localhost',
-                        port: '5984',
-                        name: 'oas',
+                        host: environment.db.host,
+                        port: environment.db.port,
+                        name: environment.db.name,
                         document: 'spec'
                     },
                     baseDir: Path.resolve('./modules/mocks'),
