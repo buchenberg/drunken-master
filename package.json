@@ -34,6 +34,7 @@
         "tape": "^4"
     },
     "scripts": {
+        "postinstall": "cd client && npm i",
         "start": "node server.js",
         "build:client": "cd client && ng build",
         "postbuild:client": "cp -rv client/dist/* modules/public",
