@@ -27,7 +27,7 @@ module.exports = {
         const nano = require('nano')(dbURL);
         const db = nano.use(options.db.name);
         options.basedir = options.basedir || process.cwd();
-        options.docspath = Utils.prefix(options.docspath || '/api-docs', '/');
+        options.docspath = options.docspath || '/swagger';
 
         db.update = function (obj, key, callback) {
             var db = this;
@@ -38,6 +38,7 @@ module.exports = {
         };
 
         db.get(options.db.document, function (err, body) {
+            log('running dbget');
             if (body && body.spec) {
                 log('Spec found!');
                 options.api = body.spec;
@@ -52,7 +53,7 @@ module.exports = {
                 options.api = loadApi(options.api);
             }
 
-            // Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
+            Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
             if (options.api.hasOwnProperty('basePath')) {
                 options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
                 basePath = Utils.unsuffix(options.api.basePath, '/');
@@ -103,36 +104,15 @@ module.exports = {
                 path: '/{param*}',
                 handler: {
                     directory: {
-                        path: 'modules/public'
+                        path: 'modules/ui/build'
                     }
                 }
-            });
-
-
-            //API docs route
-            server.route({
-                method: 'GET',
-                path: options.docspath,
-                config: {
-                    handler: function (request, reply) {
-                        db.get(options.db.document, function (err, res) {
-                            if (err) {
-                                error('No update! ', err);
-                                reply({ error: err });
-                            }
-                            log('Got it!');
-                            reply(res.spec);
-                        });
-                    },
-                    cors: options.cors
-                },
-                vhost: options.vhost
             });
 
             // OAS Routes
             server.route({
                 method: 'PUT',
-                path: '/oas',
+                path: options.docspath,
                 config: {
                     handler: function (request, reply) {
                         db.update({
@@ -152,7 +132,7 @@ module.exports = {
             });
             server.route({
                 method: 'GET',
-                path: '/oas',
+                path: options.docspath,
                 config: {
                     handler: function (request, reply) {
                         db.get(options.db.document, function (err, res) {
@@ -195,16 +175,8 @@ module.exports = {
     }
 };
 
-/**
- * Loads the api from a path, with support for yaml..
- * @param apiPath
- * @returns {Object}
- */
-function loadApi(apiPath) {
-    if (apiPath.indexOf('.yaml') === apiPath.length - 5 || apiPath.indexOf('.yml') === apiPath.length - 4) {
-        return Yaml.load(Fs.readFileSync(apiPath));
-    }
-    return require(apiPath);
+function loadApi(api) {
+    return JSON.parse(api);
 }
 
 

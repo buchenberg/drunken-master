@@ -13,14 +13,17 @@
         "glue": "^4.1.0",
         "h2o2": "^5.4.0",
         "hapi": "^16.5.2",
-        "hapi-swaggered-ui": "^2.6.0",
+        "hapi-swaggered-ui": "github:buchenberg/hapi-swaggered-ui",
         "inert": "^4.1.0",
         "nano": "^6.4.0",
+        "react": "^15.6.1",
+        "react-dom": "^15.6.1",
         "swaggerize-hapi": "^2.0.1",
         "swaggerize-routes": "github:buchenberg/swaggerize-routes",
         "swagmock": "github:buchenberg/swagmock",
         "uuid": "^3.1.0",
-        "vision": "^4.1.1"
+        "vision": "^4.1.1",
+        "zone.js": "^0.8.16"
     },
     "devDependencies": {
         "dredd": "^3.4.3",
@@ -30,15 +33,15 @@
         "istanbul": "~0.4.3",
         "js-yaml": "^3.9.1",
         "supertest": "^1.2.0",
-        "swagger-parser": "^3.4.1",
+        "swagger-parser": "^3.4.2",
         "tape": "^4"
     },
     "scripts": {
-        "postinstall": "cd client && npm i",
+        "postinstall": "cd modules/ui && yarn",
         "start": "node server.js",
-        "build:client": "cd client && ng build",
-        "postbuild:client": "cp -rv client/dist/* modules/public",
-        "serve:client": "cd client && ng serve",
+        "build:client": "cd modules/ui && yarn build",
+        "postbuild:client": "cp -rv modules/ui/build/* modules/public",
+        "serve:client": "cd modules/ui && yarn start",
         "test": "npm run dredd",
         "dredd": "dredd",
         "lint": "eslint ."

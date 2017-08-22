@@ -5,14 +5,14 @@ const Path = require('path');
 const debug = require('debug')('server');
 const Chalk = require('chalk');
 
-let tls = false;
-
-
+// Load environmental variables or suitable defaults
 const environment = {
+    tls: process.env.TLS || false,
     db: {
         host: process.env.DB_HOST || 'localhost',
         port: process.env.DB_PORT || 5984,
-        name: process.env.DB_NAME || 'oas'
+        name: process.env.DB_NAME || 'oas',
+        docname: process.env.DB_DOC_NAME || 'spec'
     },
     api: {
         host: process.env.API_HOST || 'localhost',
@@ -40,7 +40,7 @@ const manifest = {
             host: environment.api.host,
             port: environment.api.port,
             labels: 'api',
-            tls: tls,
+            tls: environment.tls,
             routes: {
                 cors: {
                     origin: ['*']
@@ -70,24 +70,24 @@ const manifest = {
                         host: environment.db.host,
                         port: environment.db.port,
                         name: environment.db.name,
-                        document: 'spec'
+                        document: environment.db.docname
                     },
                     baseDir: Path.resolve('./modules/mocks'),
-                    docspath: '/swagger'
+                    docspath: '/oas'
                 }
             }
         },
-        {
-            plugin: {
-                register: 'hapi-swaggered-ui',
-                options: {
-                    swaggerEndpoint: '/oas',
-                    path: '/swagger-ui',
-                    title: 'Drunken Master',
-                    swaggerOptions: {}
-                }
-            }
-        }
+        // {
+        //     plugin: {
+        //         register: 'hapi-swaggered-ui',
+        //         options: {
+        //             swaggerEndpoint: '/oas',
+        //             path: '/swagger-ui',
+        //             title: 'Drunken Master',
+        //             swaggerOptions: {}
+        //         }
+        //     }
+        // }
     ]
 };
 
