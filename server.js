@@ -76,18 +76,7 @@ const manifest = {
                     docspath: '/oas'
                 }
             }
-        },
-        // {
-        //     plugin: {
-        //         register: 'hapi-swaggered-ui',
-        //         options: {
-        //             swaggerEndpoint: '/oas',
-        //             path: '/swagger-ui',
-        //             title: 'Drunken Master',
-        //             swaggerOptions: {}
-        //         }
-        //     }
-        // }
+        }
     ]
 };
 
@@ -101,6 +90,6 @@ Glue.compose(manifest, options, (err, server) => {
     }
     server.start(() => {
         server.plugins.mocks.setHost(server.info.host + ':' + server.info.port);
-        debug(`Swagger UI is running on ${Chalk.cyan(Chalk.underline(server.info.uri + '/swagger-ui'))}`);
+        debug(`Drunken Master is running on ${Chalk.cyan(Chalk.underline(server.info.uri))}`);
     });
 });
