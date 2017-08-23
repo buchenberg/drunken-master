@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import swaggerEditor, { plugins } from 'swagger-editor';
 import swaggerUI from "swagger-ui";
+import Yaml from "js-yaml";
 import RaisedButton from 'material-ui/RaisedButton';
 import { Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle } from 'material-ui/Toolbar';
 import './SwaggerEditor.css';
@@ -11,8 +12,6 @@ import 'swagger-editor/dist/swagger-editor.css';
 
 
 class SwaggerEditor extends Component {
-
-    oasUrl = 'http://localhost:9999/oas'
 
 
     componentDidMount() {
@@ -39,28 +38,59 @@ class SwaggerEditor extends Component {
 
     constructor(props) {
         super(props);
+        this.oasUrl = 'http://localhost:9999/oas'
         this.state = {
         };
     }
 
+    isYaml(doc){
+        try {
+            var yaml = Yaml.safeLoad(doc);
+            console.log(doc);
+            return true;
+          } catch (e) {
+            console.log(e);
+            return false;
+          }
+    }
+    
+
     handleClickSave(event, index, value) {
+        const self = this;
+        const content = localStorage.getItem('swagger-editor-content');
+
+        const isYaml = function (doc){
+            try {
+                var yaml = Yaml.safeLoad(doc);
+                console.log(doc);
+                return true;
+              } catch (e) {
+                console.log(e);
+                return false;
+              }
+        };
+        const bodyJson = function (doc) {
+            if (isYaml(doc)) {
+                console.log('yaml found');
+                return Yaml.safeLoad(doc) 
+            } else {
+                console.log('json found');
+                return doc
+            }
+        };
+        
+        
         //TODO make url var
         fetch( 'http://localhost:9999/oas', {
             method: 'PUT',
             headers: {
-                'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: localStorage.getItem('swagger-editor-content')
+            body: content
         })
         .then((response) => response.json())
         .then((responseJson) => {
-          alert(responseJson);
-        //   this.setState({
-        //     isLoading: false,
-        //   }, function() {
-        //     // do something with new state
-        //   });
+          alert(Yaml.safeDump(responseJson));
         })
         .catch((error) => {
           console.error(error);
