@@ -19,7 +19,8 @@ log.log = console.log.bind(console);
 
 module.exports = {
     register: function (server, options, next) {
-        var routes, basePath;
+        var routes, newRoutes, basePath, defaulthandler;
+
 
         Assert.ok(Thing.isObject(options), 'Expected options to be an object.');
         const dbURL = `http://${options.db.host}:${options.db.port}`;
@@ -27,7 +28,10 @@ module.exports = {
         const nano = require('nano')(dbURL);
         const db = nano.use(options.db.name);
         options.basedir = options.basedir || process.cwd();
-        options.docspath = options.docspath || '/swagger';
+        options.docspath = options.docspath || '/oas';
+        options.cors = {
+            origin: ['*']
+        };
 
         db.update = function (obj, key, callback) {
             var db = this;
@@ -58,7 +62,7 @@ module.exports = {
                 options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
                 basePath = Utils.unsuffix(options.api.basePath, '/');
 
-                const defaulthandler = function (request, reply) {
+                defaulthandler = function (request, reply) {
                     let status = 200;
                     let path = request.route.path.replace(options.api.basePath, '');
                     let mockOptions = {
@@ -66,7 +70,7 @@ module.exports = {
                         operation: request.method,
                         response: status
                     };
-                    log('mock options', mockOptions);
+
 
                     let responseMock = Mockgen(options.api).responses(mockOptions);
                     responseMock.then(mock => {
@@ -87,11 +91,14 @@ module.exports = {
                 //Add all known routes
                 routes.forEach(function (route) {
                     //Define the route
-                    server.route({
+                    server.malkoha.route({
                         method: route.method,
                         path: basePath + route.path,
-                        handler: route.handler,
-                        vhost: options.vhost
+                        vhost: options.vhost,
+                        config: {
+                            handler: route.handler,
+                            cors: options.cors
+                        }
                     });
                 });
             } else {
@@ -109,6 +116,76 @@ module.exports = {
                 }
             });
 
+            // server route
+            server.route({
+                method: 'PUT',
+                path: '/server',
+                config: {
+                    handler: function (request, reply) {
+                        
+                        debug('rerouting..');
+                        db.get(options.db.document, function (err, body) {
+                            //options.api = body.spec;
+                            // Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
+                            body.spec.basePath = Utils.prefix(body.spec.basePath || '/', '/');
+                            basePath = Utils.unsuffix(body.spec.basePath, '/');
+                            const myHandler = function (request, reply) {
+                                let status = 200;
+                                let path = request.route.path.replace(body.spec.basePath, '');
+                                let mockOptions = {
+                                    path: path,
+                                    operation: request.method,
+                                    response: status
+                                };
+            
+            
+                                let responseMock = Mockgen(body.spec).responses(mockOptions);
+                                responseMock.then(mock => {
+                                    reply(mock);
+                                }).catch(error => {
+                                    reply({ 'drunken-master-error': error });
+                                });
+                            };
+                            newRoutes = builder({
+                                'baseDir': options.baseDir,
+                                'api': body.spec,
+                                'schema-extensions': true,
+                                'defaulthandler': myHandler
+                            });
+                            //Add all known routes
+                            const routesReport = [];
+                            routes.forEach(function (route) {
+                                //Delete the route
+                                log(`deleting ${route.path}`);
+                                server.malkoha.delete({
+                                    method: route.method,
+                                    path: basePath + route.path,
+                                    vhost: options.vhost
+                                });
+                            });
+                            newRoutes.forEach(function (newRoute) {
+                                routesReport.push(newRoute.path);
+                                log(`adding ${newRoute.path}`);
+                                //Define the route
+                                server.malkoha.route({
+                                    method: newRoute.method,
+                                    path: basePath + newRoute.path,
+                                    vhost: options.vhost,
+                                    config: {
+                                        handler: myHandler,
+                                        cors: true
+                                    }
+                                });
+                            });
+                            reply({ 'routes': routesReport }).code(200);
+                        });
+
+                    },
+                    cors: options.cors
+                },
+                vhost: options.vhost
+            });
+
             // OAS Routes
             server.route({
                 method: 'PUT',
@@ -119,10 +196,8 @@ module.exports = {
                             spec: request.payload
                         }, options.db.document, function (err, res) {
                             if (err) {
-                                error('No update! ', err);
                                 reply({ error: err });
                             }
-                            log('Updated!', res);
                             reply(res);
                         });
                     },
@@ -133,7 +208,7 @@ module.exports = {
             server.route({
                 method: 'GET',
                 path: options.docspath,
-                
+
                 config: {
                     json: {
                         space: 2
@@ -141,7 +216,6 @@ module.exports = {
                     handler: function (request, reply) {
                         db.get(options.db.document, function (err, res) {
                             if (err) {
-                                error('No update! ', err);
                                 reply({ error: err });
                             }
                             log('Got it!');
@@ -152,17 +226,6 @@ module.exports = {
                 },
                 vhost: options.vhost
             });
-
-            //Add all known routes
-            // routes.forEach(function (route) {
-            //     //Define the route
-            //     server.route({
-            //         method: route.method,
-            //         path: basePath + route.path,
-            //         handler: route.handler,
-            //         vhost: options.vhost
-            //     });
-            // });
 
             //Expose plugin api
             server.expose({

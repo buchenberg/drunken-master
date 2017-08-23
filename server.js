@@ -4,6 +4,7 @@ const Glue = require('glue');
 const Path = require('path');
 const debug = require('debug')('server');
 const Chalk = require('chalk');
+const { Malkoha } = require('malkoha');
 
 // Load environmental variables or suitable defaults
 const environment = {
@@ -51,14 +52,17 @@ const manifest = {
     ],
     registrations: [
         {
+            plugin: Malkoha
+        },
+        {
             plugin: 'inert'
         },
         {
             plugin: 'vision'
         },
-        {
-            plugin: 'blipp'
-        },
+        // {
+        //     plugin: 'blipp'
+        // },
         {
             plugin: 'h2o2'
         },
