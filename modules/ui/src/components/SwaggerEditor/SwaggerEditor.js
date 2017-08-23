@@ -29,6 +29,7 @@ class SwaggerEditor extends Component {
         // Binding this to that
         this.handleClickSave = this.handleClickSave.bind(this);
         this.handleClickReload = this.handleClickReload.bind(this);
+        this.handleClickReroute = this.handleClickReroute.bind(this);
     }
 
 
@@ -112,8 +113,29 @@ class SwaggerEditor extends Component {
             });
 
     };
-
     handleClickReload = () => {
+        swaggerEditor({
+            dom_id: '#swagger-editor',
+            url: this.oasJsonUrl,
+            layout: 'EditorLayout',
+            presets: [
+                swaggerUI.presets.apis
+            ],
+            plugins: [
+                plugins.EditorPlugin,
+                plugins.ValidationPlugin,
+                plugins.ValidationApiPlugin,
+                plugins.LocalStoragePlugin,
+                plugins.EditorAutosuggestPlugin,
+                plugins.EditorAutosuggestSnippetsPlugin,
+                plugins.EditorAutosuggestKeywordsPlugin,
+                plugins.EditorAutosuggestRefsPlugin,
+                plugins.EditorAutosuggestOAS3KeywordsPlugin,
+            ]
+        })
+    }
+
+    handleClickReroute = () => {
         //TODO make url var
         fetch(this.routeUpdateUrl, {
             method: 'PUT',
@@ -146,8 +168,9 @@ class SwaggerEditor extends Component {
         return <div id='swagger-editor-wrapper'>
             <Toolbar>
                 <ToolbarGroup firstChild={true}>
+                    <RaisedButton label="Reload" primary={true} onClick={this.handleClickReload} />
                     <RaisedButton label="Save" primary={true} onClick={this.handleClickSave} />
-                    <RaisedButton label="Reload" onClick={this.handleClickReload} />
+                    <RaisedButton label="Reroute" onClick={this.handleClickReroute} />
                 </ToolbarGroup>
                 <ToolbarGroup>
                     <ToolbarTitle text="Revision" />
