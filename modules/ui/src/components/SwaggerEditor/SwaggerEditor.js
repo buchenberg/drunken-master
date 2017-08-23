@@ -14,11 +14,40 @@ import 'swagger-editor/dist/swagger-editor.css';
 
 class SwaggerEditor extends Component {
 
+    constructor(props) {
+        super(props);
+        this.oasUrl = '/oas';
+        this.oasJsonUrl = '/oas/json';
+        this.routeUpdateUrl = '/server';
+        this.state = {
+            saved: false,
+            rerouted: false,
+            routes: [],
+            revision: ''
+        };
+
+        // Binding this to that
+        this.handleClickSave = this.handleClickSave.bind(this);
+        this.handleClickReload = this.handleClickReload.bind(this);
+    }
+
 
     componentDidMount() {
+        fetch(this.oasUrl, {
+            method: 'GET'
+        })
+            .then((response) => response.json())
+            .then((responseJson) => {
+                this.setState({
+                    revision: responseJson._rev
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+            });
         swaggerEditor({
             dom_id: '#swagger-editor',
-            url: this.oasUrl,
+            url: this.oasJsonUrl,
             layout: 'EditorLayout',
             presets: [
                 swaggerUI.presets.apis
@@ -37,52 +66,39 @@ class SwaggerEditor extends Component {
         })
     }
 
-    constructor(props) {
-        super(props);
-        this.oasUrl = '/oas';
-        this.routeUpdateUrl = '/server';
-        this.state = {
-            saved: false,
-            rerouted: false,
-            routes: [],
-            revision: ''
-        };
 
-        // Binding this to that
-        this.handleClickSave = this.handleClickSave.bind(this);
-        this.handleClickReload = this.handleClickReload.bind(this);
-    }
 
 
     handleClickSave = () => {
         const content = localStorage.getItem('swagger-editor-content');
 
-        // const isYaml = function (doc) {
-        //     try {
-        //         var yaml = Yaml.safeLoad(doc);
-        //         console.log(doc);
-        //         return true;
-        //     } catch (e) {
-        //         console.log(e);
-        //         return false;
-        //     }
-        // };
-        // const bodyJson = function (doc) {
-        //     if (isYaml(doc)) {
-        //         console.log('yaml found');
-        //         return Yaml.safeLoad(doc)
-        //     } else {
-        //         console.log('json found');
-        //         return doc
-        //     }
-        // };
+        const isJson = function (doc) {
+            try {
+                var json = JSON.parse(doc);
+                console.log('True. This doc is JSON');
+                return true;
+            } catch (e) {
+                console.log(e);
+                return false;
+            }
+        };
+
+        const bodyJson = function (doc) {
+            if (isJson(doc)) {
+                console.log('json found');
+                return doc
+            } else {
+                console.log('yaml found');
+                return Yaml.safeLoad(doc)
+            }
+        };
 
         fetch(this.oasUrl, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: content
+            body: bodyJson(content)
         })
             .then((response) => response.json())
             .then((responseJson) => {
@@ -133,11 +149,16 @@ class SwaggerEditor extends Component {
                     <RaisedButton label="Save" primary={true} onClick={this.handleClickSave} />
                     <RaisedButton label="Reload" onClick={this.handleClickReload} />
                 </ToolbarGroup>
+                <ToolbarGroup>
+                    <ToolbarTitle text="Revision" />
+                    {this.state.revision}
+                </ToolbarGroup>
+
             </Toolbar>
             <div id='swagger-editor' />
             <Snackbar
                 open={this.state.saved}
-                message={ `OAS saved as revision ${this.state.revision}.` }
+                message={`OAS saved as revision ${this.state.revision}.`}
                 autoHideDuration={4000}
                 onRequestClose={this.handleSnackbarClose}
             />

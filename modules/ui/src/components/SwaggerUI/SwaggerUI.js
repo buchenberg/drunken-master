@@ -7,18 +7,41 @@ import './SwaggerUI.css';
 
 
 class SwaggerUI extends Component {
+
+    constructor(props) {
+        super(props);
+        this.oasJsonUrl = '/oas/json';
+        this.state = {
+            reloaded: false
+        };
+
+        // Binding this to that
+        this.handleClickReload = this.handleClickReload.bind(this);
+    }
     componentDidMount() {
         swaggerUI({
             dom_id: '#swagger-ui',
-            url: 'http://localhost:9999/oas',
+            url: '/oas/json',
             presets: [presets.apis],
         });
+    }
+
+    handleClickReload = () => {
+        swaggerUI({
+            dom_id: '#swagger-ui',
+            url: '/oas/json',
+            presets: [presets.apis],
+        });
+        this.setState({
+            reloaded: true
+        })
     }
     render() {
         return <div id='swagger-ui-wrapper'>
             <Toolbar>
                 <ToolbarGroup firstChild={true}>
-                    <RaisedButton label="Reload" primary={true} onClick={this.handleClick}/>
+                    <RaisedButton label="Reload" primary={true} onClick={this.handleClickReload}/>
+                    {this.state.reloaded.toString()}
                 </ToolbarGroup>
             </Toolbar>
             <div id='swagger-ui' />

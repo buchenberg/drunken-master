@@ -1,11 +1,5 @@
-#swagger-editor {
-    font-size: 1em;
-    padding: 1em;
-  }
-
 #editor-wrapper {
   height: 100%;
-  border:1em solid #000;
 }
   
 .container {

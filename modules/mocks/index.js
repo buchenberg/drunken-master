@@ -219,7 +219,47 @@ module.exports = {
                                 reply({ error: err });
                             }
                             log('Got it!');
+                            reply(res);
+                        });
+                    },
+                    cors: options.cors
+                },
+                vhost: options.vhost
+            });
+            server.route({
+                method: 'GET',
+                path: options.docspath + '/json',
+
+                config: {
+                    json: {
+                        space: 2
+                    },
+                    handler: function (request, reply) {
+                        db.get(options.db.document, function (err, res) {
+                            if (err) {
+                                reply({ error: err });
+                            }
+                            log('Got it!');
                             reply(res.spec);
+                        });
+                    },
+                    cors: options.cors
+                },
+                vhost: options.vhost
+            });
+
+            server.route({
+                method: 'GET',
+                path: options.docspath + '/yaml',
+
+                config: {
+                    handler: function (request, reply) {
+                        db.get(options.db.document, function (err, res) {
+                            if (err) {
+                                reply({ error: err });
+                            }
+                            log('Got it!');
+                            reply(Yaml.safeDump(res.spec));
                         });
                     },
                     cors: options.cors
