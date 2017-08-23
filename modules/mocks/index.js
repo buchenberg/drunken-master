@@ -133,7 +133,11 @@ module.exports = {
             server.route({
                 method: 'GET',
                 path: options.docspath,
+                
                 config: {
+                    json: {
+                        space: 2
+                    },
                     handler: function (request, reply) {
                         db.get(options.db.document, function (err, res) {
                             if (err) {

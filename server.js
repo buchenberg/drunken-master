@@ -44,9 +44,6 @@ const manifest = {
             routes: {
                 cors: {
                     origin: ['*']
-                },
-                json: {
-                    space: 2
                 }
             }
 
