@@ -12,12 +12,13 @@ import 'swagger-editor/dist/swagger-editor.css';
 
 class SwaggerEditor extends Component {
 
-    editor = null;
+    oasUrl = 'http://localhost:9999/oas'
+
 
     componentDidMount() {
-        const editor = swaggerEditor({
+        swaggerEditor({
             dom_id: '#swagger-editor',
-            url: 'http://localhost:9999/oas',
+            url: this.oasUrl,
             layout: 'EditorLayout',
             presets: [
                 swaggerUI.presets.apis
@@ -32,12 +33,10 @@ class SwaggerEditor extends Component {
                 plugins.EditorAutosuggestKeywordsPlugin,
                 plugins.EditorAutosuggestRefsPlugin,
                 plugins.EditorAutosuggestOAS3KeywordsPlugin,
-            ],
-            // components: {
-            //     EditorLayout
-            //   }
+            ]
         })
     }
+
     constructor(props) {
         super(props);
         this.state = {
@@ -45,7 +44,27 @@ class SwaggerEditor extends Component {
     }
 
     handleClickSave(event, index, value) {
-        console.log('spec', localStorage.getItem('swagger-editor-content'));
+        //TODO make url var
+        fetch( 'http://localhost:9999/oas', {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: localStorage.getItem('swagger-editor-content')
+        })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          alert(responseJson);
+        //   this.setState({
+        //     isLoading: false,
+        //   }, function() {
+        //     // do something with new state
+        //   });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     };
 
     handleClickReload(event, index, value) {
