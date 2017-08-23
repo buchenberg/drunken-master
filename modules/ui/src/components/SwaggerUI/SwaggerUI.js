@@ -10,7 +10,7 @@ class SwaggerUI extends Component {
     componentDidMount() {
         swaggerUI({
             dom_id: '#swagger-ui',
-            url: '/oas',
+            url: 'http://localhost:9999/oas',
             presets: [presets.apis],
         });
     }

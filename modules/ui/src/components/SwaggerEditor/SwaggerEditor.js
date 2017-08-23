@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import swaggerEditor from 'swagger-editor';
+import swaggerEditor, { plugins } from 'swagger-editor';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle } from 'material-ui/Toolbar';
 import './SwaggerEditor.css';
@@ -10,22 +10,36 @@ import 'swagger-editor/dist/swagger-editor.css';
 
 
 class SwaggerEditor extends Component {
+
+    editor = null;
+
     componentDidMount() {
-        swaggerEditor({
+        const editor = swaggerEditor({
             dom_id: '#swagger-editor',
-            url: '/oas',
-            layout: 'EditorLayout'
+            url: 'http://localhost:9999/oas',
+            layout: 'EditorLayout',
+            plugins: [
+            plugins.EditorPlugin,
+            plugins.ValidationPlugin,
+            plugins.ValidationApiPlugin,
+            plugins.LocalStoragePlugin,
+            plugins.EditorAutosuggestPlugin,
+            plugins.EditorAutosuggestSnippetsPlugin,
+            plugins.EditorAutosuggestKeywordsPlugin,
+            plugins.EditorAutosuggestRefsPlugin,
+            plugins.EditorAutosuggestOAS3KeywordsPlugin,
+            ]
         })
     }
     constructor(props) {
         super(props);
         this.state = {
-            value: 3,
+            swagger: '',
         };
     }
 
     handleClickSave(event, index, value) {
-        console.log('save clicked');
+        console.log('spec', this.editor.specSelectors.specStr());
     };
 
     handleClickReload(event, index, value) {
