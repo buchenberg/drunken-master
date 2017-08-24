@@ -159,7 +159,7 @@ class SwaggerEditor extends Component {
             <div id='swagger-editor' />
             <Snackbar
                 open={this.state.saved}
-                message={`OAS saved as revision ${this.state.revision}.`}
+                message={`Saved ${this.state.revision}.`}
                 autoHideDuration={4000}
                 onRequestClose={this.handleSnackbarClose}
             />

@@ -42,6 +42,7 @@
         "postinstall": "cd modules/ui && yarn",
         "start": "node server.js",
         "dev": "nodemon server.js",
+        "prebuild:client": "rm -rf modules/public/*",
         "build:client": "cd modules/ui && yarn build",
         "postbuild:client": "cp -rv modules/ui/build/* modules/public",
         "serve:client": "cd modules/ui && yarn start",
