@@ -1,13 +1,12 @@
 'use strict';
 const debug = require('debug');
-const Path = require('path');
 var Assert = require('assert');
 var Thing = require('core-util-is');
 var builder = require('swaggerize-routes');
 var Utils = require('./lib/utils');
 var Yaml = require('js-yaml');
-var Fs = require('fs');
-var Mockgen = require('./lib/mockgen.js');
+// var Mockgen = require('./lib/mockgen.js');
+const Swagmock = require('swagmock');
 
 const error = debug('index:error');
 const log = debug('index:log');
@@ -19,7 +18,7 @@ log.log = console.log.bind(console);
 
 module.exports = {
     register: function (server, options, next) {
-        var routes, newRoutes, basePath, defaulthandler;
+        var routes, basePath;
 
 
         Assert.ok(Thing.isObject(options), 'Expected options to be an object.');
@@ -33,6 +32,25 @@ module.exports = {
             origin: ['*']
         };
 
+        const defaulthandler = function (request, reply) {
+            // let status = 200;
+            let path = request.route.path.replace(options.api.basePath, '');
+            log(options.api.paths[path]);
+            let mockOptions = {
+                path: path,
+                operation: request.method,
+                response: '200'
+            };
+            log(mockOptions);
+            let Mockgen = Swagmock(options.api, mockOptions);
+            Mockgen.responses(mockOptions)
+            .then( mock => {
+                reply(mock.responses[0]);
+            }).catch(error => {
+                reply({ 'drunken-master-error': error });
+            });
+        };
+
         db.update = function (obj, key, callback) {
             var db = this;
             db.get(key, function (error, existing) {
@@ -42,9 +60,7 @@ module.exports = {
         };
 
         db.get(options.db.document, function (err, body) {
-            log('running dbget');
             if (body && body.spec) {
-                log('Spec found!');
                 options.api = body.spec;
             } else {
                 error('No spec found! Check your DB.');
@@ -62,24 +78,6 @@ module.exports = {
                 options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
                 basePath = Utils.unsuffix(options.api.basePath, '/');
 
-                defaulthandler = function (request, reply) {
-                    let status = 200;
-                    let path = request.route.path.replace(options.api.basePath, '');
-                    let mockOptions = {
-                        path: path,
-                        operation: request.method,
-                        response: status
-                    };
-
-
-                    let responseMock = Mockgen(options.api).responses(mockOptions);
-                    responseMock.then(mock => {
-                        reply(mock);
-                    }).catch(error => {
-                        reply({ 'drunken-master-error': error });
-                    });
-                };
-
                 //Build routes
                 routes = builder({
                     'baseDir': options.baseDir,
@@ -90,6 +88,7 @@ module.exports = {
 
                 //Add dynamic routes
                 routes.forEach(function (route) {
+                    log(`adding ${route.name}`);
                     // Define the dynamic route
                     server.malkoha.route({
                         method: route.method,
@@ -101,6 +100,7 @@ module.exports = {
                         }
                     });
                 });
+                log(routes);
             } else {
                 options.api.basePath = '/';
             }
@@ -129,66 +129,46 @@ module.exports = {
                             options.api = body.spec;
                             Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
                             body.spec.basePath = Utils.prefix(body.spec.basePath || '/', '/');
-                            basePath = Utils.unsuffix(body.spec.basePath, '/');
-                            const myHandler = function (request, reply) {
-                                let status = 200;
-                                let path = request.route.path.replace(body.spec.basePath, '');
-                                let mockOptions = {
-                                    path: path,
-                                    operation: request.method,
-                                    response: status
-                                };
-            
-            
-                                let responseMock = Mockgen(body.spec).responses(mockOptions);
-                                responseMock.then(mock => {
-                                    reply(mock);
-                                }).catch(error => {
-                                    reply({ 'drunken-master-error': error });
-                                });
-                            };
-                            newRoutes = builder({
+                            if (options.api.hasOwnProperty('basePath')) {
+                                options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
+                            }
+                            basePath = Utils.unsuffix(options.api.basePath, '/');
+                            // if (routes) {
+                            //     routes.forEach(function (route, index) {
+                            //         //Delete the route
+                            //         log(`deleting ${route.name}`);
+                            //         server.malkoha.delete({
+                            //             method: route.method,
+                            //             path: basePath + route.path,
+                            //             vhost: options.vhost
+                            //         });
+                            //         routes.splice(index, 1);
+                            //     });
+                            // }
+                            routes = builder({
                                 'baseDir': options.baseDir,
-                                'api': body.spec,
+                                'api': options.api,
                                 'schema-extensions': true,
-                                'defaulthandler': myHandler
+                                'defaulthandler': defaulthandler
                             });
                             //Add all known routes
                             const routesReport = [];
-                            if (routes) {
-                                routes.forEach(function (route) {
-                                    //Delete the route
-                                    log(`deleting ${route.path}`);
-                                    server.malkoha.delete({
-                                        method: route.method,
-                                        path: basePath + route.path,
-                                        vhost: options.vhost
-                                    });
-                                });
-                            }
+                           
                             routes.forEach(function (route) {
-                                //Delete the route
-                                log(`deleting ${route.path}`);
-                                server.malkoha.delete({
-                                    method: route.method,
-                                    path: basePath + route.path,
-                                    vhost: options.vhost
-                                });
-                            });
-                            newRoutes.forEach(function (newRoute) {
-                                routesReport.push(newRoute.path);
-                                log(`adding ${newRoute.path}`);
+                                routesReport.push(route.path);
+                                log(`adding ${route.name}`);
                                 //Define the route
                                 server.malkoha.route({
-                                    method: newRoute.method,
-                                    path: basePath + newRoute.path,
+                                    method: route.method,
+                                    path: basePath + route.path,
                                     vhost: options.vhost,
                                     config: {
-                                        handler: myHandler,
+                                        handler: defaulthandler,
                                         cors: true
                                     }
                                 });
                             });
+                            log(routes);
                             reply({ 'routes': routesReport }).code(200);
                         });
 
