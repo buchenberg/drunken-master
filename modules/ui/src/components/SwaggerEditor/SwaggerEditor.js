@@ -8,30 +8,25 @@ import { Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle } from 'material-
 import './SwaggerEditor.css';
 import 'swagger-editor/dist/swagger-editor.css';
 
-
-
-
-
 class SwaggerEditor extends Component {
 
     constructor(props) {
         super(props);
         this.oasUrl = '/oas';
         this.oasJsonUrl = '/oas/json';
+        this.oasYamlUrl = '/oas/yaml';
         this.routeUpdateUrl = '/server';
         this.state = {
             saved: false,
-            rerouted: false,
-            routes: [],
             revision: ''
         };
-
         // Binding this to that
         this.handleClickSave = this.handleClickSave.bind(this);
         this.handleClickReload = this.handleClickReload.bind(this);
-        this.handleClickReroute = this.handleClickReroute.bind(this);
-    }
 
+        this.reroute = this.reroute.bind(this);
+        this.loadEditor = this.loadEditor.bind(this);
+    }
 
     componentDidMount() {
         fetch(this.oasUrl, {
@@ -46,9 +41,13 @@ class SwaggerEditor extends Component {
             .catch((error) => {
                 console.error(error);
             });
-        swaggerEditor({
+        this.loadEditor();
+    }
+
+    loadEditor = () => {
+        return swaggerEditor({
             dom_id: '#swagger-editor',
-            url: this.oasJsonUrl,
+            url: this.oasYamlUrl,
             layout: 'EditorLayout',
             presets: [
                 swaggerUI.presets.apis
@@ -67,21 +66,16 @@ class SwaggerEditor extends Component {
         })
     }
 
-
-
-
     handleClickSave = () => {
         const content = localStorage.getItem('swagger-editor-content');
 
         const isJson = function (doc) {
             try {
                 var json = JSON.parse(doc);
-                console.log('True. This doc is JSON');
-                return true;
             } catch (e) {
-                console.log(e);
                 return false;
             }
+            return true;
         };
 
         const bodyJson = function (doc) {
@@ -90,10 +84,13 @@ class SwaggerEditor extends Component {
                 return doc
             } else {
                 console.log('yaml found');
-                return Yaml.safeLoad(doc)
+                let jsonObj = Yaml.safeLoad(doc);
+                let jsonStr = JSON.stringify(jsonObj);
+                return jsonStr;
             }
         };
 
+        //Save OAS spec
         fetch(this.oasUrl, {
             method: 'PUT',
             headers: {
@@ -107,36 +104,19 @@ class SwaggerEditor extends Component {
                     saved: true,
                     revision: responseJson.rev
                 });
+                this.reroute();
             })
             .catch((error) => {
                 console.error(error);
             });
 
-    };
-    handleClickReload = () => {
-        swaggerEditor({
-            dom_id: '#swagger-editor',
-            url: this.oasJsonUrl,
-            layout: 'EditorLayout',
-            presets: [
-                swaggerUI.presets.apis
-            ],
-            plugins: [
-                plugins.EditorPlugin,
-                plugins.ValidationPlugin,
-                plugins.ValidationApiPlugin,
-                plugins.LocalStoragePlugin,
-                plugins.EditorAutosuggestPlugin,
-                plugins.EditorAutosuggestSnippetsPlugin,
-                plugins.EditorAutosuggestKeywordsPlugin,
-                plugins.EditorAutosuggestRefsPlugin,
-                plugins.EditorAutosuggestOAS3KeywordsPlugin,
-            ]
-        })
     }
 
-    handleClickReroute = () => {
-        //TODO make url var
+    handleClickReload = () => {
+        this.loadEditor();
+    }
+
+    reroute = () => {
         fetch(this.routeUpdateUrl, {
             method: 'PUT',
             headers: {
@@ -153,7 +133,7 @@ class SwaggerEditor extends Component {
             .catch((error) => {
                 console.error(error);
             });
-    };
+    }
 
     handleSnackbarClose = () => {
         this.setState({
@@ -161,8 +141,7 @@ class SwaggerEditor extends Component {
             rerouted: false,
             routes: []
         });
-    };
-
+    }
 
     render() {
         return <div id='swagger-editor-wrapper'>
@@ -170,7 +149,6 @@ class SwaggerEditor extends Component {
                 <ToolbarGroup firstChild={true}>
                     <RaisedButton label="Reload" primary={true} onClick={this.handleClickReload} />
                     <RaisedButton label="Save" primary={true} onClick={this.handleClickSave} />
-                    <RaisedButton label="Reroute" onClick={this.handleClickReroute} />
                 </ToolbarGroup>
                 <ToolbarGroup>
                     <ToolbarTitle text="Revision" />
@@ -182,12 +160,6 @@ class SwaggerEditor extends Component {
             <Snackbar
                 open={this.state.saved}
                 message={`OAS saved as revision ${this.state.revision}.`}
-                autoHideDuration={4000}
-                onRequestClose={this.handleSnackbarClose}
-            />
-            <Snackbar
-                open={this.state.rerouted}
-                message="Drunken Master has been rerouted."
                 autoHideDuration={4000}
                 onRequestClose={this.handleSnackbarClose}
             />

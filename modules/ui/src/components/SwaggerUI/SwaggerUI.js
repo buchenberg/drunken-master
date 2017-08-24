@@ -41,7 +41,6 @@ class SwaggerUI extends Component {
             <Toolbar>
                 <ToolbarGroup firstChild={true}>
                     <RaisedButton label="Reload" primary={true} onClick={this.handleClickReload}/>
-                    {this.state.reloaded.toString()}
                 </ToolbarGroup>
             </Toolbar>
             <div id='swagger-ui' />

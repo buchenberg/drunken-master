@@ -46,7 +46,6 @@ module.exports = {
             if (body && body.spec) {
                 log('Spec found!');
                 options.api = body.spec;
-
             } else {
                 error('No spec found! Check your DB.');
                 options.api = {};
@@ -58,6 +57,7 @@ module.exports = {
             }
 
             Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
+
             if (options.api.hasOwnProperty('basePath')) {
                 options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
                 basePath = Utils.unsuffix(options.api.basePath, '/');
@@ -88,9 +88,9 @@ module.exports = {
                     'defaulthandler': defaulthandler
                 });
 
-                //Add all known routes
+                //Add dynamic routes
                 routes.forEach(function (route) {
-                    //Define the route
+                    // Define the dynamic route
                     server.malkoha.route({
                         method: route.method,
                         path: basePath + route.path,
@@ -105,6 +105,8 @@ module.exports = {
                 options.api.basePath = '/';
             }
 
+            // Static Routes
+
             // UI route
             server.route({
                 method: 'GET',
@@ -115,8 +117,7 @@ module.exports = {
                     }
                 }
             });
-
-            // server route
+            // server route (reroute)
             server.route({
                 method: 'PUT',
                 path: '/server',
@@ -125,8 +126,8 @@ module.exports = {
                         
                         debug('rerouting..');
                         db.get(options.db.document, function (err, body) {
-                            //options.api = body.spec;
-                            // Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
+                            options.api = body.spec;
+                            Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
                             body.spec.basePath = Utils.prefix(body.spec.basePath || '/', '/');
                             basePath = Utils.unsuffix(body.spec.basePath, '/');
                             const myHandler = function (request, reply) {
@@ -154,6 +155,17 @@ module.exports = {
                             });
                             //Add all known routes
                             const routesReport = [];
+                            if (routes) {
+                                routes.forEach(function (route) {
+                                    //Delete the route
+                                    log(`deleting ${route.path}`);
+                                    server.malkoha.delete({
+                                        method: route.method,
+                                        path: basePath + route.path,
+                                        vhost: options.vhost
+                                    });
+                                });
+                            }
                             routes.forEach(function (route) {
                                 //Delete the route
                                 log(`deleting ${route.path}`);
@@ -187,6 +199,7 @@ module.exports = {
             });
 
             // OAS Routes
+            // PUT OAS JSON
             server.route({
                 method: 'PUT',
                 path: options.docspath,
@@ -205,6 +218,7 @@ module.exports = {
                 },
                 vhost: options.vhost
             });
+            // GET OAS
             server.route({
                 method: 'GET',
                 path: options.docspath,
@@ -226,6 +240,7 @@ module.exports = {
                 },
                 vhost: options.vhost
             });
+            // GET OAS JSON
             server.route({
                 method: 'GET',
                 path: options.docspath + '/json',
@@ -240,14 +255,16 @@ module.exports = {
                                 reply({ error: err });
                             }
                             log('Got it!');
-                            reply(res.spec);
+                            reply(res.spec)
+                            .code(200)
+                            .type('application/json');
                         });
                     },
                     cors: options.cors
                 },
                 vhost: options.vhost
             });
-
+            // GET OAS YAML
             server.route({
                 method: 'GET',
                 path: options.docspath + '/yaml',
@@ -259,7 +276,9 @@ module.exports = {
                                 reply({ error: err });
                             }
                             log('Got it!');
-                            reply(Yaml.safeDump(res.spec));
+                            reply(Yaml.safeDump(res.spec))
+                            .code(200)
+                            .type('application/x-yaml');
                         });
                     },
                     cors: options.cors
