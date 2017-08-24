@@ -7,6 +7,14 @@ Drunken Master is an [Open API Specification](https://github.com/OAI/OpenAPI-Spe
 
 Clone or download this repository.
 
+## Database
+
+Drunken Master uses Apache [CouchDB](http://couchdb.apache.org/) to persist and version the OAS document. The easiest way to get a CouchDB instance up is by using [Docker](https://www.docker.com/). If you have Docker installed just run the following command. Make sure you edit the '/some/local/directory' part to match your system.
+
+```
+docker run -p 5984:5984 -d -v /some/local/directory:/usr/local/var/lib/couchdb --name drunken-master-db couchdb
+``` 
+At this point the CouchDB instance will be available on the Docker host at http://localhost:5985. You can view the CouchDB UI at http://localhost:5984/_utils/index.html.
 ## Server
 
 Drunken Master uses the awesome Hapi.js server to serve up the mock routes and the static UI. Run the following command root directory to install server dependencies.
@@ -20,6 +28,30 @@ To start the server issue the following command.
 ```
 yarn start
 ```
+
+### Server Routes
+
+The following routes are available on all instances of the Drunken Master server. They are baked right in and do not rely on OAS definitions.
+
+#### GET /oas
+
+This returns the OAS meta-document. The actual OpenAPI specification is in a child object called spec. The document also has an _id ('spec') and _rev (e.g. 142-a2b7348dae3d1e85fc60ae848ef60639) field.
+
+#### GET /oas/json
+
+This endpoint return a JSON version of the OpenAPI specification
+
+#### GET /oas/yaml
+
+Just like it says on the tin, this one serves a YAML representation of the OpenAPI specification.
+
+#### PUT /oas
+
+This will either create a new spec or add a revision to supercede the existing spec. In CouchDB data is immutable nothing is every really updated.
+
+#### PUT /server
+
+This call will initiate a reparsing of the OAS and a dynamic rerouting of the Hapi server. 
 ## Client
 
 Drunken Master comes with a React based web UI. If you make any changes to the modules/ui code run the following at the server root to build and and deploy the bundles to modules/public where it will be served.
