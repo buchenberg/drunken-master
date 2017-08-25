@@ -7,9 +7,20 @@ import { Tabs, Tab } from 'material-ui/Tabs';
 
 import SwaggerUI from './components/SwaggerUI/SwaggerUI';
 import SwaggerEditor from './components/SwaggerEditor/SwaggerEditor';
-import RouteList from './components/Routelist/RouteList';
 
 import './App.css';
+
+
+const styles = {
+  headline: {
+    fontSize: 24,
+    paddingTop: 16,
+    marginBottom: 12,
+    fontWeight: 400,
+  },
+};
+
+
 
 class App extends Component {
   render() {
@@ -19,19 +30,19 @@ class App extends Component {
 
           <AppBar title="Drunken Master"/>
           <Tabs>
-            <Tab label="Swagger Editor" data-route="/editor">
+            <Tab label="Swagger Editor" data-route="/home">
               <div>
-                <SwaggerEditor/>
+                <SwaggerEditor></SwaggerEditor>
               </div>
             </Tab>
-            <Tab label="Swagger UI" data-route="/viewer">
+            <Tab label="Swagger UI" data-route="/home">
               <div>
-                <SwaggerUI/>
+                <SwaggerUI></SwaggerUI>
               </div>
             </Tab>
-            <Tab label="Other stuff" data-route="/routes">
+            <Tab label="Other stuff" data-route="/home">
               <div>
-                <RouteList/>
+                More content here:
               </div>
             </Tab>
           </Tabs>

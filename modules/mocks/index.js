@@ -33,6 +33,7 @@ module.exports = {
         };
 
         const defaulthandler = function (request, reply) {
+            // let status = 200;
             let path = request.route.path.replace(options.api.basePath, '');
             log(options.api.paths[path]);
             let mockOptions = {
@@ -43,42 +44,10 @@ module.exports = {
             log(mockOptions);
             let Mockgen = Swagmock(options.api, mockOptions);
             Mockgen.responses(mockOptions)
-                .then(mock => {
-                    reply(mock.responses[0]);
-                }).catch(error => {
-                    reply({ 'drunken-master-error': error });
-                });
-        };
-
-        const buildRoutes = function () {
-            //Set basePath
-            if (options.api.hasOwnProperty('basePath')) {
-                options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
-                basePath = Utils.unsuffix(options.api.basePath, '/');
-                //log(routes);
-            } else {
-                options.api.basePath = '/';
-            }
-            //Build dyanamic routes metadata
-            routes = builder({
-                'baseDir': options.baseDir,
-                'api': options.api,
-                'schema-extensions': true,
-                'defaulthandler': defaulthandler
-            });
-            //Add dynamic routes
-            routes.forEach(function (route) {
-                log(`adding ${route.name}`);
-                // Define the dynamic route
-                server.malkoha.route({
-                    method: route.method,
-                    path: basePath + route.path,
-                    vhost: options.vhost,
-                    config: {
-                        handler: route.handler,
-                        cors: options.cors
-                    }
-                });
+            .then( mock => {
+                reply(mock.responses[0]);
+            }).catch(error => {
+                reply({ 'drunken-master-error': error });
             });
         };
 
@@ -105,7 +74,36 @@ module.exports = {
 
             Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
 
-            buildRoutes();
+            if (options.api.hasOwnProperty('basePath')) {
+                options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
+                basePath = Utils.unsuffix(options.api.basePath, '/');
+
+                //Build routes
+                routes = builder({
+                    'baseDir': options.baseDir,
+                    'api': options.api,
+                    'schema-extensions': true,
+                    'defaulthandler': defaulthandler
+                });
+
+                //Add dynamic routes
+                routes.forEach(function (route) {
+                    log(`adding ${route.name}`);
+                    // Define the dynamic route
+                    server.malkoha.route({
+                        method: route.method,
+                        path: basePath + route.path,
+                        vhost: options.vhost,
+                        config: {
+                            handler: route.handler,
+                            cors: options.cors
+                        }
+                    });
+                });
+                log(routes);
+            } else {
+                options.api.basePath = '/';
+            }
 
             // Static Routes
 
@@ -125,19 +123,28 @@ module.exports = {
                 path: '/server',
                 config: {
                     handler: function (request, reply) {
-
+                        
                         debug('rerouting..');
                         db.get(options.db.document, function (err, body) {
                             options.api = body.spec;
                             Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
-
-                            buildRoutes();
                             body.spec.basePath = Utils.prefix(body.spec.basePath || '/', '/');
                             if (options.api.hasOwnProperty('basePath')) {
                                 options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
                             }
                             basePath = Utils.unsuffix(options.api.basePath, '/');
-                           
+                            // if (routes) {
+                            //     routes.forEach(function (route, index) {
+                            //         //Delete the route
+                            //         log(`deleting ${route.name}`);
+                            //         server.malkoha.delete({
+                            //             method: route.method,
+                            //             path: basePath + route.path,
+                            //             vhost: options.vhost
+                            //         });
+                            //         routes.splice(index, 1);
+                            //     });
+                            // }
                             routes = builder({
                                 'baseDir': options.baseDir,
                                 'api': options.api,
@@ -145,10 +152,10 @@ module.exports = {
                                 'defaulthandler': defaulthandler
                             });
                             //Add all known routes
-                            //const routesReport = [];
-
+                            const routesReport = [];
+                           
                             routes.forEach(function (route) {
-                                // routesReport.push(route.path);
+                                routesReport.push(route.path);
                                 log(`adding ${route.name}`);
                                 //Define the route
                                 server.malkoha.route({
@@ -162,7 +169,7 @@ module.exports = {
                                 });
                             });
                             log(routes);
-                            reply({ 'routes': routes }).code(200);
+                            reply({ 'routes': routesReport }).code(200);
                         });
 
                     },
@@ -229,8 +236,8 @@ module.exports = {
                             }
                             log('Got it!');
                             reply(res.spec)
-                                .code(200)
-                                .type('application/json');
+                            .code(200)
+                            .type('application/json');
                         });
                     },
                     cors: options.cors
@@ -250,28 +257,9 @@ module.exports = {
                             }
                             log('Got it!');
                             reply(Yaml.safeDump(res.spec))
-                                .code(200)
-                                .type('application/x-yaml');
-                        });
-                    },
-                    cors: options.cors
-                },
-                vhost: options.vhost
-            });
-
-            // GET ROUTES
-            server.route({
-                method: 'GET',
-                path: '/routes',
-
-                config: {
-                    json: {
-                        space: 2
-                    },
-                    handler: function (request, reply) {
-                        reply(routes)
                             .code(200)
-                            .type('application/json');
+                            .type('application/x-yaml');
+                        });
                     },
                     cors: options.cors
                 },
