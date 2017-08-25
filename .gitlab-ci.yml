@@ -21,7 +21,6 @@ deploy_to_rancher_toolbox_prod:
     - export RANCHER_URL=${ODINSSON_RANCHER_URL}
     - export RANCHER_ACCESS_KEY=${ODINSSON_RANCHER_ACCESS_KEY}
     - export RANCHER_SECRET_KEY=${ODINSSON_RANCHER_SECRET_KEY}
-    - chmod +x ./rancher-compose
-    - ./rancher-compose -f ./.rancher/rancher-compose.yml up -d --upgrade --confirm-upgrade
+    - rancher-compose -f rancher-compose.yml up -d --upgrade --confirm-upgrade
   only:
     - master
