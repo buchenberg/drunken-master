@@ -1,0 +1,27 @@
+image: panamax.spectrumxg.com/qis/standard-docker-builders:0.12.4-ranchercompose
+stages:
+  - build_and_upload_image
+  - deploy
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN panamax.spectrumxg.com
+build_and_upload_image:
+  stage: build_and_upload_image
+  tags:
+   - docker
+  script:
+   - docker build -t panamax.spectrumxg.com/figaro/drunken-master:${CI_BUILD_REF} .
+   - docker push panamax.spectrumxg.com/figaro/drunken-master:${CI_BUILD_REF}
+  only:
+    - master
+deploy_to_rancher_toolbox_prod:
+  stage: deploy
+  tags:
+    - docker
+  script:
+    - export RANCHER_URL=${ODINSSON_RANCHER_URL}
+    - export RANCHER_ACCESS_KEY=${ODINSSON_RANCHER_ACCESS_KEY}
+    - export RANCHER_SECRET_KEY=${ODINSSON_RANCHER_SECRET_KEY}
+    - chmod +x ./rancher-compose
+    - ./rancher-compose -f ./.rancher/rancher-compose.yml up -d --upgrade --confirm-upgrade
+  only:
+    - master

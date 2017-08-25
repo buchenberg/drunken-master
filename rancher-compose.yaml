@@ -1,0 +1,37 @@
+version: '2'
+services:
+  lb:
+    image: rancher/load-balancer-service
+    ports:
+      - "9999:9999"
+    links:
+      - "drunken-master:drunken-master"
+
+  drunken-master:
+    image: panamax.spectrumxg.com/figaro/drunken-master:${CI_BUILD_REF}
+    environment:
+      - DEBUG=*
+      - API_HOST=0.0.0.0
+      - API_PORT=9999
+      - DB_HOST=drunken-master-db
+      - DB_PORT=5984
+      - DB_NAME=oas
+      - DB_DOC_NAME=spec
+    expose:
+      - 9999
+    labels:
+      sxg.service.type: web
+      sxg.service.port: 9999
+      io.rancher.scheduler.affinity:host_label: sxg.host.type=app
+    links:
+      - drunken-master-db
+    health_check:
+      port: 9999
+      request_line: GET / HTTP/1.0
+      interval: 10000
+      healthy_threshold: 2
+      unhealthy_threshold: 3
+      response_timeout: 10000
+  drunken-master-db:
+    image: couchdb:1.6.1
+
