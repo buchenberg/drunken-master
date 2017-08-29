@@ -22,6 +22,7 @@ services:
     labels:
       sxg.service.type: web
       sxg.service.port: 9999
+      sxg.service.subdomain: drunken_master
       io.rancher.scheduler.affinity:host_label: sxg.host.type=app
     links:
       - drunken-master-db
