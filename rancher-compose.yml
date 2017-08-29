@@ -36,7 +36,8 @@ services:
       response_timeout: 10000
   drunken-master-db:
     image: couchdb:1.6.1
-    expose: 5984
+    expose: 
+     - 5984
     ports:
      - "5984:5984"
 
