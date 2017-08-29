@@ -266,6 +266,23 @@ module.exports = {
                 vhost: options.vhost
             });
 
+            // GET OAS YAML
+            server.route({
+                method: 'GET',
+                path: '/health',
+
+                config: {
+                    handler: function (request, reply) {
+                        reply(
+                            {'status': 'OK'}
+                        )
+                        .code(200);
+                    },
+                    cors: options.cors
+                },
+                vhost: options.vhost
+            });
+
             //Expose plugin api
             server.expose({
                 api: options.api,
