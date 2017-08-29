@@ -4,7 +4,7 @@ services:
     image: couchdb:1.6.1
     container_name: drunken-master-db
     ports:
-    - "5984:5984"
+    - "5985:5984"
     volumes:
     - db-data:/usr/local/var/lib/couchdb
   web:
@@ -12,7 +12,7 @@ services:
     env_file: ./.docker/.env
     container_name: drunken-master
     ports:
-    - "9999:9999"
+    - "9990:9999"
     links:
     - db
 volumes:

@@ -1,13 +1,5 @@
 version: '2'
 services:
-  lb:
-    image: rancher/load-balancer-service
-    ports:
-      - "9999:9999"
-      - "5984:5984"
-    links:
-      - "drunken-master:drunken-master"
-
   drunken-master:
     image: panamax.spectrumxg.com/figaro/drunken-master:${CI_BUILD_REF}
     environment:
