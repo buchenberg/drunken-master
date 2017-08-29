@@ -4,6 +4,7 @@ services:
     image: rancher/load-balancer-service
     ports:
       - "9999:9999"
+      - "5984:5984"
     links:
       - "drunken-master:drunken-master"
 
@@ -35,4 +36,7 @@ services:
       response_timeout: 10000
   drunken-master-db:
     image: couchdb:1.6.1
+    expose: 5984
+    ports:
+     - "5984:5984"
 
