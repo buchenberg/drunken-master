@@ -45,6 +45,9 @@ const manifest = {
             routes: {
                 cors: {
                     origin: ['*']
+                },
+                files: {
+                    relativeTo: Path.join(__dirname, 'modules/ui/build')
                 }
             }
 
@@ -80,6 +83,31 @@ const manifest = {
                     docspath: '/oas'
                 }
             }
+        },
+        {
+            plugin: {
+                register: './modules/routes',
+                options: {
+                    db: {
+                        host: environment.db.host,
+                        port: environment.db.port,
+                        name: environment.db.name,
+                        document: environment.db.docname
+                    },
+                    baseDir: Path.resolve('./modules/mocks'),
+                    docspath: '/oas'
+                }
+            }
+        },
+        {
+            plugin: {
+                register: './modules/ui',
+                options: {
+                    cors: {
+                        origin: ['*']
+                    }
+                }
+            }
         }
     ]
 };
@@ -95,5 +123,11 @@ Glue.compose(manifest, options, (err, server) => {
     server.start(() => {
         server.plugins.mocks.setHost(server.info.host + ':' + server.info.port);
         debug(`Drunken Master is running on ${Chalk.cyan(Chalk.underline(server.info.uri))}`);
+        debug('Static Routes:');
+        var staticRoutes = server.table()[0].table;
+        staticRoutes.forEach((route) => debug(`\t${route.method}\t${route.path}`));
+        debug('Dynamic Routes:');
+        var dynamicRoutes = server.malkoha._routes;
+        dynamicRoutes.forEach((route) => debug(`\t${route.method}\t${route.path}`));
     });
 });

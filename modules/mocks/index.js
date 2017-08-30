@@ -4,7 +4,6 @@ var Assert = require('assert');
 var Thing = require('core-util-is');
 var builder = require('swaggerize-routes');
 var Utils = require('./lib/utils');
-var Yaml = require('js-yaml');
 // var Mockgen = require('./lib/mockgen.js');
 const Swagmock = require('swagmock');
 
@@ -35,13 +34,13 @@ module.exports = {
         const defaulthandler = function (request, reply) {
             // let status = 200;
             let path = request.route.path.replace(options.api.basePath, '');
-            log(options.api.paths[path]);
+            // log(options.api.paths[path]);
             let mockOptions = {
                 path: path,
                 operation: request.method,
                 response: '200'
             };
-            log(mockOptions);
+            // log(mockOptions);
             let Mockgen = Swagmock(options.api, mockOptions);
             Mockgen.responses(mockOptions)
             .then( mock => {
@@ -88,7 +87,7 @@ module.exports = {
 
                 //Add dynamic routes
                 routes.forEach(function (route) {
-                    log(`adding ${route.name}`);
+                    // log(`adding ${route.name}`);
                     // Define the dynamic route
                     server.malkoha.route({
                         method: route.method,
@@ -100,23 +99,13 @@ module.exports = {
                         }
                     });
                 });
-                log(routes);
+                // log(routes);
             } else {
                 options.api.basePath = '/';
             }
 
             // Static Routes
 
-            // UI route
-            server.route({
-                method: 'GET',
-                path: '/{param*}',
-                handler: {
-                    directory: {
-                        path: 'modules/ui/build'
-                    }
-                }
-            });
             // server route (reroute)
             server.route({
                 method: 'PUT',
@@ -156,7 +145,7 @@ module.exports = {
                            
                             routes.forEach(function (route) {
                                 routesReport.push(route.path);
-                                log(`adding ${route.name}`);
+                                // log(`adding ${route.name}`);
                                 //Define the route
                                 server.malkoha.route({
                                     method: route.method,
@@ -178,110 +167,9 @@ module.exports = {
                 vhost: options.vhost
             });
 
-            // OAS Routes
-            // PUT OAS JSON
-            server.route({
-                method: 'PUT',
-                path: options.docspath,
-                config: {
-                    handler: function (request, reply) {
-                        db.update({
-                            spec: request.payload
-                        }, options.db.document, function (err, res) {
-                            if (err) {
-                                reply({ error: err });
-                            }
-                            reply(res);
-                        });
-                    },
-                    cors: options.cors
-                },
-                vhost: options.vhost
-            });
-            // GET OAS
-            server.route({
-                method: 'GET',
-                path: options.docspath,
+            
 
-                config: {
-                    json: {
-                        space: 2
-                    },
-                    handler: function (request, reply) {
-                        db.get(options.db.document, function (err, res) {
-                            if (err) {
-                                reply({ error: err });
-                            }
-                            log('Got it!');
-                            reply(res);
-                        });
-                    },
-                    cors: options.cors
-                },
-                vhost: options.vhost
-            });
-            // GET OAS JSON
-            server.route({
-                method: 'GET',
-                path: options.docspath + '/json',
-
-                config: {
-                    json: {
-                        space: 2
-                    },
-                    handler: function (request, reply) {
-                        db.get(options.db.document, function (err, res) {
-                            if (err) {
-                                reply({ error: err });
-                            }
-                            log('Got it!');
-                            reply(res.spec)
-                            .code(200)
-                            .type('application/json');
-                        });
-                    },
-                    cors: options.cors
-                },
-                vhost: options.vhost
-            });
-            // GET OAS YAML
-            server.route({
-                method: 'GET',
-                path: options.docspath + '/yaml',
-
-                config: {
-                    handler: function (request, reply) {
-                        db.get(options.db.document, function (err, res) {
-                            if (err) {
-                                reply({ error: err });
-                            }
-                            log('Got it!');
-                            reply(Yaml.safeDump(res.spec))
-                            .code(200)
-                            .type('application/x-yaml');
-                        });
-                    },
-                    cors: options.cors
-                },
-                vhost: options.vhost
-            });
-
-            // GET OAS YAML
-            server.route({
-                method: 'GET',
-                path: '/health',
-
-                config: {
-                    handler: function (request, reply) {
-                        reply(
-                            {'status': 'OK'}
-                        )
-                        .code(200);
-                    },
-                    cors: options.cors
-                },
-                vhost: options.vhost
-            });
+           
 
             //Expose plugin api
             server.expose({

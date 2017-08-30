@@ -3,10 +3,13 @@ import swaggerEditor, { plugins } from 'swagger-editor';
 import swaggerUI from "swagger-ui";
 import Yaml from "js-yaml";
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
 import Snackbar from 'material-ui/Snackbar';
 import { Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle } from 'material-ui/Toolbar';
 import './SwaggerEditor.css';
 import 'swagger-editor/dist/swagger-editor.css';
+
 
 class SwaggerEditor extends Component {
 
@@ -17,8 +20,12 @@ class SwaggerEditor extends Component {
         this.oasYamlUrl = '/oas/yaml';
         this.routeUpdateUrl = '/server';
         this.state = {
+            oasExists: false,
             saved: false,
-            revision: ''
+            revision: '',
+            dialogOpen: false,
+            dialogTitle: '',
+            dialogMessage: ''
         };
         // Binding this to that
         this.handleClickSave = this.handleClickSave.bind(this);
@@ -26,23 +33,68 @@ class SwaggerEditor extends Component {
 
         this.reroute = this.reroute.bind(this);
         this.loadEditor = this.loadEditor.bind(this);
+        this.handleDialogClose = this.handleDialogClose.bind(this);
     }
 
-    componentDidMount() {
-        fetch(this.oasUrl, {
+    checkForOas() {
+        fetch('/status', {
             method: 'GET'
         })
             .then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
-                    revision: responseJson._rev
+                    oasExists: responseJson.oas
                 });
             })
             .catch((error) => {
                 console.error(error);
             });
-        this.loadEditor();
+
     }
+
+    getOas() {
+        fetch(this.oasUrl, {
+            method: 'GET'
+        })
+            .then((response) => response.json())
+            .then((responseJson) => {
+                if (responseJson.hasOwnProperty('_rev')) {
+                    this.setState({
+                        oasExists: true,
+                        revision: responseJson._rev
+                    });
+                    this.loadEditor();
+                } else {
+                    this.setState({
+                        oasExists: false,
+                        dialogOpen: true,
+                        dialogTitle: 'Error retrieving OAS!',
+                        dialogMessage: responseJson.error
+                    });
+                }
+
+            })
+            .catch((error) => {
+                this.setState({
+                    oasExists: false,
+                    dialogOpen: true,
+                    dialogTitle: 'Error retrieving OAS!',
+                    dialogMessage: error
+                });
+            });
+    }
+
+    componentDidMount() {
+        this.getOas();
+
+    }
+
+
+    handleDialogClose = () => {
+      this.setState({
+          dialogOpen: false
+        });
+    };
 
     loadEditor = () => {
         return swaggerEditor({
@@ -144,6 +196,15 @@ class SwaggerEditor extends Component {
     }
 
     render() {
+
+        const actions = [
+            <FlatButton
+                label="OK"
+                primary={true}
+                keyboardFocused={true}
+                onClick={this.handleDialogClose}
+            />,
+        ];
         return <div id='swagger-editor-wrapper'>
             <Toolbar>
                 <ToolbarGroup firstChild={true}>
@@ -156,7 +217,19 @@ class SwaggerEditor extends Component {
                 </ToolbarGroup>
 
             </Toolbar>
+
             <div id='swagger-editor' />
+
+            <Dialog
+                title={this.state.dialogTitle}
+                actions={actions}
+                modal={false}
+                open={this.state.dialogOpen}
+                onRequestClose={this.handleDialogClose}>
+                <p>Reason: {this.state.dialogMessage}</p>
+                <p>The editor will attempt to load the last OAS from your local cache.</p>
+            </Dialog>
+
             <Snackbar
                 open={this.state.saved}
                 message={`Saved ${this.state.revision}.`}
