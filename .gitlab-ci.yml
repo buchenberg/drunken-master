@@ -9,7 +9,7 @@ build_and_upload_image:
   tags:
    - docker
   script:
-   - docker build -t panamax.spectrumxg.com/figaro/drunken-master:${CI_BUILD_REF} .
+   - docker build -f ./.docker/web/Dockerfile -t panamax.spectrumxg.com/figaro/drunken-master:${CI_BUILD_REF} .
    - docker push panamax.spectrumxg.com/figaro/drunken-master:${CI_BUILD_REF}
   only:
     - master
