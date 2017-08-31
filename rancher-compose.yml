@@ -31,7 +31,7 @@ services:
   drunken-master-db:
     build:
       context: ./.docker/db/
-    image: couchdb:1.6.1
+    # image: couchdb:1.6.1
     expose: 
       - 5984
     ports:
