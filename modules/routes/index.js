@@ -1,7 +1,7 @@
 'use strict';
 //DEBUGGING
 const debug = require('debug');
-const error = debug('index:error');
+const error = debug('routes:error');
 const log = debug('routes:log');
 log.log = console.log.bind(console);
 
@@ -25,11 +25,20 @@ module.exports = {
             origin: ['*']
         };
 
-        db.update = function (obj, key, callback) {
-            var db = this;
-            db.get(key, function (error, existing) {
-                if (!error) obj._rev = existing._rev;
-                db.insert(obj, key, callback);
+        const bootstrapDB = function (request, reply) {
+            nano.db.get(options.db.name, function (err, body) {
+                if (err) {
+                    error(err);
+                    nano.db.create(options.db.name, function (err, body) {
+                        if (!err) {
+                            log(`database ${options.db.name} created.`);
+                            reply(body);
+                        }
+                    });
+                } else {
+                    log(`database ${options.db.name} exists.`);
+                    reply(body);
+                }
             });
         };
 
@@ -102,9 +111,24 @@ module.exports = {
                     }, options.db.document, function (err, res) {
                         if (err) {
                             reply({ error: err });
+                        } else {
+                            reply(res);
                         }
-                        reply(res);
+                        
                     });
+                },
+                cors: options.cors
+            },
+            vhost: options.vhost
+        });
+
+        // Bootstrap the database
+        server.route({
+            method: 'POST',
+            path: options.docspath,
+            config: {
+                handler: function (request, reply) {
+                    bootstrapDB(request, reply);
                 },
                 cors: options.cors
             },
