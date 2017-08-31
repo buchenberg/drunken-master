@@ -1,19 +1,27 @@
 version: '3'
 services:
   db:
-    image: couchdb:1.6.1
+    build:
+      context: ./.docker/db/
+      # dockerfile: ./.docker/db/Dockerfile
     container_name: drunken-master-db
     ports:
     - "5985:5984"
     volumes:
-    - db-data:/usr/local/var/lib/couchdb
+      - ./.docker/db/logs:/usr/local/var/log/couchdb
+    # volumes:
+    # - db-data:/usr/local/var/lib/couchdb
   web:
-    build: .
-    env_file: ./.docker/.env
+    build:
+      context: .
+      dockerfile: ./.docker/web/Dockerfile
+    env_file: ./.docker/web/.env
     container_name: drunken-master
     ports:
     - "9990:9999"
     links:
     - db
-volumes:
-  db-data:
+    volumes:
+      - .:/usr/src/app
+# volumes:
+#   db-data:

@@ -10,6 +10,8 @@ services:
       - DB_PORT=5984
       - DB_NAME=oas
       - DB_DOC_NAME=spec
+      - DB_ADMIN_NAME=drunk
+      - DB_ADMIN_PASSWORD=password
     expose:
       - 9999
     labels:
@@ -27,6 +29,8 @@ services:
       unhealthy_threshold: 3
       response_timeout: 10000
   drunken-master-db:
+    build:
+      context: ./.docker/db/
     image: couchdb:1.6.1
     expose: 
       - 5984

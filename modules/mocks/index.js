@@ -6,10 +6,11 @@ var builder = require('swaggerize-routes');
 var Utils = require('./lib/utils');
 // var Mockgen = require('./lib/mockgen.js');
 const Swagmock = require('swagmock');
+const Chalk = require('chalk');
 
-const error = debug('index:error');
-const log = debug('index:log');
-log.log = console.log.bind(console);
+const Error = debug('mocks:error');
+const Log = debug('mocks:log');
+
 
 
 
@@ -22,7 +23,7 @@ module.exports = {
 
         Assert.ok(Thing.isObject(options), 'Expected options to be an object.');
         const dbURL = `http://${options.db.host}:${options.db.port}`;
-        log('dbURL: ', dbURL);
+        Log('dbURL: ', Chalk.blue(dbURL));
         const nano = require('nano')(dbURL);
         const db = nano.use(options.db.name);
         options.basedir = options.basedir || process.cwd();
@@ -62,7 +63,7 @@ module.exports = {
             if (body && body.spec) {
                 options.api = body.spec;
             } else {
-                error('No spec found! Check your DB.');
+                Error(Chalk.red('No spec found! Check your DB.'));
                 options.api = {};
                 //return;
             }
@@ -122,18 +123,18 @@ module.exports = {
                                 options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
                             }
                             basePath = Utils.unsuffix(options.api.basePath, '/');
-                            // if (routes) {
-                            //     routes.forEach(function (route, index) {
-                            //         //Delete the route
-                            //         log(`deleting ${route.name}`);
-                            //         server.malkoha.delete({
-                            //             method: route.method,
-                            //             path: basePath + route.path,
-                            //             vhost: options.vhost
-                            //         });
-                            //         routes.splice(index, 1);
-                            //     });
-                            // }
+                            if (routes) {
+                                routes.forEach(function (route, index) {
+                                    //Delete the route
+                                    Log(`deleting ${Chalk.red(route.name)}`);
+                                    server.malkoha.delete({
+                                        method: route.method,
+                                        path: basePath + route.path,
+                                        vhost: options.vhost
+                                    });
+                                    routes.splice(index, 1);
+                                });
+                            }
                             routes = builder({
                                 'baseDir': options.baseDir,
                                 'api': options.api,
@@ -145,7 +146,7 @@ module.exports = {
                            
                             routes.forEach(function (route) {
                                 routesReport.push(route.path);
-                                // log(`adding ${route.name}`);
+                                Log(`adding ${Chalk.green(route.name)}`);
                                 //Define the route
                                 server.malkoha.route({
                                     method: route.method,
@@ -157,7 +158,6 @@ module.exports = {
                                     }
                                 });
                             });
-                            log(routes);
                             reply({ 'routes': routesReport }).code(200);
                         });
 

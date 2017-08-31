@@ -13,7 +13,9 @@ const environment = {
         host: process.env.DB_HOST || 'localhost',
         port: process.env.DB_PORT || 5984,
         name: process.env.DB_NAME || 'oas',
-        docname: process.env.DB_DOC_NAME || 'spec'
+        docname: process.env.DB_DOC_NAME || 'spec',
+        admin: process.env.DB_ADMIN_NAME,
+        password: process.env.DB_ADMIN_PASSWORD
     },
     api: {
         host: process.env.API_HOST || 'localhost',
@@ -77,7 +79,9 @@ const manifest = {
                         host: environment.db.host,
                         port: environment.db.port,
                         name: environment.db.name,
-                        document: environment.db.docname
+                        document: environment.db.docname,
+                        admin: environment.db.admin,
+                        password: environment.db.password
                     },
                     baseDir: Path.resolve('./modules/mocks'),
                     docspath: '/oas'
@@ -92,7 +96,9 @@ const manifest = {
                         host: environment.db.host,
                         port: environment.db.port,
                         name: environment.db.name,
-                        document: environment.db.docname
+                        document: environment.db.docname,
+                        admin: environment.db.admin,
+                        password: environment.db.password
                     },
                     baseDir: Path.resolve('./modules/mocks'),
                     docspath: '/oas'

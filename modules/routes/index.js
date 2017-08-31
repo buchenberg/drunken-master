@@ -25,23 +25,47 @@ module.exports = {
             origin: ['*']
         };
 
-        const bootstrapDB = function (request, reply) {
-            nano.db.get(options.db.name, function (err, body) {
+
+        // Get the session token from the cookie string
+        const parseSession = function (cookieString) {
+            return cookieString.replace(/(?:^AuthSession=)(.*)(;\sV.*)/i, '$1');
+        };
+
+        // Check to see that the database exists. If not then create it.
+        const bootstrapDB = function () {
+            nano.db.get(options.db.name, function (err) {
                 if (err) {
-                    error(err);
-                    nano.db.create(options.db.name, function (err, body) {
-                        if (!err) {
-                            log(`database ${options.db.name} created.`);
-                            reply(body);
+                    error(`There was an error finding the ${options.db.name} database:\n${err}`);
+                    log(`Attempting to create ${options.db.name} database.`);
+                    log('Getting admin session.');
+                    var token = '';
+                    nano.auth(options.db.admin, options.db.password, function (err, body, headers) {
+                        if (err) {
+                            return error(err);
                         }
+                        if (headers && headers['set-cookie']) {
+                            token = parseSession(headers['set-cookie'][0]);
+                        }
+                        Nano(
+                            {
+                                url: dbURL,
+                                cookie: 'AuthSession=' + token
+                            }
+                        ).db.create(options.db.name, function (err) {
+                            if (err) {
+                                error(`There was an error creating the ${options.db.name} database:\n${err}`);
+                            } else {
+                                log(`database ${options.db.name} created.`);
+                            }
+                        });
                     });
                 } else {
                     log(`database ${options.db.name} exists.`);
-                    reply(body);
                 }
             });
         };
-
+        
+        // Custom update function
         db.update = function (obj, key, callback) {
             var db = this;
             db.get(key, function (error, existing) {
@@ -50,17 +74,8 @@ module.exports = {
             });
         };
 
-        //Root
-        server.route({
-            method: 'GET',
-            path: '/',
-            config: {
-                handler: function (request, reply) {
-                    reply().redirect('/ui');
-                }
-            }
-
-        });
+        // Bootstrap the database
+        bootstrapDB();
 
         // HEALTH ROUTE
         server.route({
@@ -122,7 +137,7 @@ module.exports = {
                         } else {
                             reply(res);
                         }
-                        
+
                     });
                 },
                 cors: options.cors

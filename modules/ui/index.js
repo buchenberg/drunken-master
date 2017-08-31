@@ -6,17 +6,30 @@ module.exports = {
             origin: ['*']
         },
 
+        // Root redirect
+        server.route({
+            method: 'GET',
+            path: '/',
+            config: {
+                handler: function (request, reply) {
+                    reply().redirect('/ui');
+                },
+                cors: options.cors
+            }
+
+        });
+
         // UI route
         server.route({
             method: 'GET',
             path: '/ui/{file*}',
-            handler: {
-                directory: {
-                    path: '.',
-                    redirectToSlash: true
-                }
-            },
             config: {
+                handler: {
+                    directory: {
+                        path: '.',
+                        redirectToSlash: true
+                    }
+                },
                 cors: options.cors
             }
         });

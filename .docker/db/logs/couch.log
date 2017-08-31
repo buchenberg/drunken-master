@@ -1,0 +1,117 @@
+[Thu, 31 Aug 2017 19:57:02 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 19:57:05 GMT] [error] [<0.155.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 19:57:05 GMT] [info] [<0.119.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 19:57:05 GMT] [error] [<0.160.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 19:57:05 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas 404
+[Thu, 31 Aug 2017 19:57:05 GMT] [info] [<0.117.0>] 172.25.0.3 - - PUT /oas 401
+[Thu, 31 Aug 2017 20:03:34 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 20:03:37 GMT] [error] [<0.148.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:03:37 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 20:03:37 GMT] [error] [<0.153.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:03:37 GMT] [info] [<0.117.0>] 172.25.0.3 - - GET /oas 404
+[Thu, 31 Aug 2017 20:03:37 GMT] [info] [<0.116.0>] 172.25.0.3 - - PUT /oas 401
+[Thu, 31 Aug 2017 20:11:40 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 20:11:44 GMT] [error] [<0.148.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:11:44 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 20:11:44 GMT] [error] [<0.154.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:11:44 GMT] [info] [<0.116.0>] 172.25.0.3 - - GET /oas 404
+[Thu, 31 Aug 2017 20:11:44 GMT] [info] [<0.115.0>] 172.25.0.3 - - PUT /oas 401
+[Thu, 31 Aug 2017 20:11:44 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 200
+[Thu, 31 Aug 2017 20:14:07 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 20:14:10 GMT] [error] [<0.148.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:14:10 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 20:14:10 GMT] [error] [<0.154.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:14:10 GMT] [info] [<0.116.0>] 172.25.0.3 - - GET /oas 404
+[Thu, 31 Aug 2017 20:14:10 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 200
+[Thu, 31 Aug 2017 20:14:10 GMT] [info] [<0.115.0>] 172.25.0.3 - - PUT /oas 401
+[Thu, 31 Aug 2017 20:17:06 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 20:17:09 GMT] [error] [<0.147.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:17:09 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 20:17:09 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 200
+[Thu, 31 Aug 2017 20:19:14 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 20:19:17 GMT] [error] [<0.148.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:19:17 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 20:19:17 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 200
+[Thu, 31 Aug 2017 20:38:25 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 20:38:28 GMT] [error] [<0.147.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:38:28 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 20:38:28 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 200
+[Thu, 31 Aug 2017 20:41:12 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 20:41:14 GMT] [error] [<0.147.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:41:14 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 20:41:14 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 200
+[Thu, 31 Aug 2017 20:42:38 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 20:42:41 GMT] [error] [<0.148.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:42:41 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 20:42:41 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 200
+[Thu, 31 Aug 2017 20:50:02 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 20:50:05 GMT] [error] [<0.147.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:50:05 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 20:50:05 GMT] [error] [<0.153.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:50:05 GMT] [info] [<0.116.0>] 172.25.0.3 - - GET /oas 404
+[Thu, 31 Aug 2017 20:50:05 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 200
+[Thu, 31 Aug 2017 20:50:05 GMT] [info] [<0.115.0>] 172.25.0.3 - - PUT /oas 401
+[Thu, 31 Aug 2017 20:57:39 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 20:57:41 GMT] [error] [<0.147.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 20:57:41 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 20:57:41 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 200
+[Thu, 31 Aug 2017 20:57:41 GMT] [info] [<0.116.0>] 172.25.0.3 - - GET /oas 400
+[Thu, 31 Aug 2017 20:57:41 GMT] [info] [<0.115.0>] 172.25.0.3 - - PUT /oas 401
+[Thu, 31 Aug 2017 21:04:12 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 21:04:15 GMT] [error] [<0.147.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 21:04:15 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 21:04:15 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 200
+[Thu, 31 Aug 2017 21:04:15 GMT] [error] [<0.153.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 21:04:15 GMT] [info] [<0.116.0>] 172.25.0.3 - - GET /oas 404
+[Thu, 31 Aug 2017 21:04:15 GMT] [info] [<0.115.0>] 172.25.0.3 - - PUT /oas 201
+[Thu, 31 Aug 2017 21:07:27 GMT] [info] [<0.110.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 21:07:27 GMT] [info] [<0.109.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 21:07:39 GMT] [info] [<0.146.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 21:07:50 GMT] [info] [<0.111.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 21:07:50 GMT] [info] [<0.112.0>] 172.25.0.3 - - PUT /oas/spec 201
+[Thu, 31 Aug 2017 21:07:50 GMT] [info] [<0.113.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:08:54 GMT] [info] [<0.372.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:08:54 GMT] [info] [<0.152.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:08:55 GMT] [info] [<0.156.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:09:05 GMT] [info] [<0.384.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:09:05 GMT] [info] [<0.385.0>] 172.25.0.3 - - PUT /oas/spec 201
+[Thu, 31 Aug 2017 21:09:05 GMT] [info] [<0.386.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:09:08 GMT] [info] [<0.454.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:15:59 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 21:16:02 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:16:02 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 401
+[Thu, 31 Aug 2017 21:19:57 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 21:20:00 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:20:00 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 401
+[Thu, 31 Aug 2017 21:21:20 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 21:21:24 GMT] [info] [<0.119.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:21:24 GMT] [info] [<0.118.0>] 172.25.0.3 - - POST /_session 401
+[Thu, 31 Aug 2017 21:22:34 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 21:22:37 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:22:38 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 401
+[Thu, 31 Aug 2017 21:23:23 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 21:23:25 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:23:26 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 401
+[Thu, 31 Aug 2017 21:24:00 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 21:24:03 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:24:03 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 200
+[Thu, 31 Aug 2017 21:24:03 GMT] [info] [<0.116.0>] 172.25.0.3 - - GET /oas 200
+[Thu, 31 Aug 2017 21:28:17 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 21:28:20 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:28:20 GMT] [info] [<0.117.0>] 172.25.0.3 - - GET /oas 200
+[Thu, 31 Aug 2017 21:28:51 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 21:28:53 GMT] [error] [<0.154.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 21:28:53 GMT] [info] [<0.119.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 21:28:54 GMT] [error] [<0.159.0>] Could not open file /usr/local/var/lib/couchdb/oas.couch: no such file or directory
+[Thu, 31 Aug 2017 21:28:54 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas 404
+[Thu, 31 Aug 2017 21:28:54 GMT] [info] [<0.117.0>] 172.25.0.3 - - POST /_session 200
+[Thu, 31 Aug 2017 21:28:54 GMT] [info] [<0.116.0>] 172.25.0.3 - - PUT /oas 201
+[Thu, 31 Aug 2017 21:34:02 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 21:34:05 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 21:34:05 GMT] [info] [<0.117.0>] 172.25.0.3 - - GET /oas 200
+[Thu, 31 Aug 2017 21:34:14 GMT] [info] [<0.116.0>] 172.25.0.3 - - GET /oas/spec 404
+[Thu, 31 Aug 2017 21:34:14 GMT] [info] [<0.115.0>] 172.25.0.3 - - PUT /oas/spec 201
+[Thu, 31 Aug 2017 21:34:14 GMT] [info] [<0.114.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:34:27 GMT] [info] [<0.32.0>] Apache CouchDB has started on http://0.0.0.0:5984/
+[Thu, 31 Aug 2017 21:34:30 GMT] [info] [<0.118.0>] 172.25.0.3 - - GET /oas/spec 200
+[Thu, 31 Aug 2017 21:34:30 GMT] [info] [<0.117.0>] 172.25.0.3 - - GET /oas 200
