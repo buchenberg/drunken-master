@@ -33,22 +33,20 @@ module.exports = {
         };
 
         const defaulthandler = function (request, reply) {
-            // let status = 200;
             let path = request.route.path.replace(options.api.basePath, '');
-            // log(options.api.paths[path]);
             let mockOptions = {
                 path: path,
                 operation: request.method,
                 response: '200'
             };
-            // log(mockOptions);
             let Mockgen = Swagmock(options.api, mockOptions);
             Mockgen.responses(mockOptions)
-            .then( mock => {
-                reply(mock.responses[0]);
-            }).catch(error => {
-                reply({ 'drunken-master-error': error });
-            });
+                .then(mock => {
+                    reply(mock.responses[0]);
+                }).catch(error => {
+                    reply({ 'drunken-master-error': error })
+                    .code(500);
+                });
         };
 
         db.update = function (obj, key, callback) {
@@ -65,7 +63,6 @@ module.exports = {
             } else {
                 Error(Chalk.red('No spec found! Check your DB.'));
                 options.api = {};
-                //return;
             }
 
             if (Thing.isString(options.api)) {
@@ -88,7 +85,6 @@ module.exports = {
 
                 //Add dynamic routes
                 routes.forEach(function (route) {
-                    // log(`adding ${route.name}`);
                     // Define the dynamic route
                     server.malkoha.route({
                         method: route.method,
@@ -100,7 +96,6 @@ module.exports = {
                         }
                     });
                 });
-                // log(routes);
             } else {
                 options.api.basePath = '/';
             }
@@ -113,8 +108,8 @@ module.exports = {
                 path: '/server',
                 config: {
                     handler: function (request, reply) {
-                        
-                        debug('rerouting..');
+
+                        Log('rerouting..');
                         db.get(options.db.document, function (err, body) {
                             options.api = body.spec;
                             Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
@@ -123,10 +118,16 @@ module.exports = {
                                 options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
                             }
                             basePath = Utils.unsuffix(options.api.basePath, '/');
+                            const routesReport = {};
                             if (routes) {
+                                routesReport.deleted = [];
                                 routes.forEach(function (route, index) {
                                     //Delete the route
                                     Log(`deleting ${Chalk.red(route.name)}`);
+                                    routesReport.deleted.push({
+                                        'path': route.path,
+                                        'name': route.name
+                                    });
                                     server.malkoha.delete({
                                         method: route.method,
                                         path: basePath + route.path,
@@ -141,11 +142,13 @@ module.exports = {
                                 'schema-extensions': true,
                                 'defaulthandler': defaulthandler
                             });
-                            //Add all known routes
-                            const routesReport = [];
-                           
+                            //Add new routes
+                            routesReport.added = [];
                             routes.forEach(function (route) {
-                                routesReport.push(route.path);
+                                routesReport.added.push({
+                                    'path': route.path,
+                                    'name': route.name
+                                });
                                 Log(`adding ${Chalk.green(route.name)}`);
                                 //Define the route
                                 server.malkoha.route({
@@ -167,9 +170,9 @@ module.exports = {
                 vhost: options.vhost
             });
 
-            
 
-           
+
+
 
             //Expose plugin api
             server.expose({

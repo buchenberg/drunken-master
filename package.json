@@ -15,7 +15,7 @@
         "hapi": "^16.5.2",
         "hapi-swaggered-ui": "github:buchenberg/hapi-swaggered-ui",
         "inert": "^4.1.0",
-        "malkoha": "^0.0.3",
+        "malkoha": "github:buchenberg/malkoha",
         "nano": "^6.4.0",
         "react": "^15.6.1",
         "react-dom": "^15.6.1",
@@ -27,6 +27,7 @@
         "zone.js": "^0.8.16"
     },
     "devDependencies": {
+        "concurrently": "^3.5.0",
         "dredd": "^3.4.3",
         "eslint": "^3.19.0",
         "generator-powdered-toast": "^1.0.0",
@@ -39,13 +40,12 @@
         "tape": "^4"
     },
     "scripts": {
-        "postinstall": "cd modules/ui && yarn",
+        "postinstall": "cd modules/ui && npm i",
         "start": "node server.js",
-        "dev": "nodemon server.js",
+        "dev": "concurrently 'nodemon server.js' 'npm run client'",
         "prebuild:client": "rm -rf modules/public/*",
-        "build:client": "cd modules/ui && yarn build",
-        "postbuild:client": "cp -rv modules/ui/build/* modules/public",
-        "serve:client": "cd modules/ui && yarn start",
+        "build:client": "cd modules/ui && npm run build",
+        "client": "cd modules/ui && npm start",
         "test": "npm run dredd",
         "dredd": "dredd",
         "lint": "eslint ."

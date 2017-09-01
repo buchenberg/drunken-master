@@ -4,11 +4,16 @@ import swaggerUI from "swagger-ui";
 import Yaml from "js-yaml";
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
+import Dead from 'mui-icons/cmdi/emoticon-dead';
+import ToggleRight from 'mui-icons/fontawesome/toggle-right';
 import Dialog from 'material-ui/Dialog';
 import Snackbar from 'material-ui/Snackbar';
 import { Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle } from 'material-ui/Toolbar';
-import './SwaggerEditor.css';
 import 'swagger-editor/dist/swagger-editor.css';
+import styles from './SwaggerEditor.css';
+// import 'swagger-editor/dist/swagger-editor.css';
+
 
 
 class SwaggerEditor extends Component {
@@ -24,6 +29,7 @@ class SwaggerEditor extends Component {
             saved: false,
             revision: '',
             dialogOpen: false,
+            uiOpen: true,
             dialogTitle: '',
             dialogMessage: ''
         };
@@ -34,6 +40,9 @@ class SwaggerEditor extends Component {
         this.reroute = this.reroute.bind(this);
         this.loadEditor = this.loadEditor.bind(this);
         this.handleDialogClose = this.handleDialogClose.bind(this);
+        this.handleToggleRight = this.handleToggleRight.bind(this);
+        this.handleToggleLeft = this.handleToggleLeft.bind(this);
+
     }
 
     checkForOas() {
@@ -91,8 +100,20 @@ class SwaggerEditor extends Component {
 
 
     handleDialogClose = () => {
-      this.setState({
-          dialogOpen: false
+        this.setState({
+            dialogOpen: false
+        });
+    };
+
+    handleToggleRight = () => {
+        this.setState({
+            uiOpen: false
+        });
+    };
+
+    handleToggleLeft = () => {
+        this.setState({
+            uiOpen: true
         });
     };
 
@@ -164,6 +185,7 @@ class SwaggerEditor extends Component {
 
     }
 
+
     handleClickReload = () => {
         this.loadEditor();
     }
@@ -179,7 +201,24 @@ class SwaggerEditor extends Component {
             .then((responseJson) => {
                 this.setState({
                     rerouted: true,
-                    routes: responseJson.routes
+                    dialogOpen: true,
+                    dialogTitle: 'Drunken Master has been rerouted.',
+                    dialogMessage: <div>
+                        <h3>Deleted routes:</h3>
+                        <ul>
+                            {responseJson.routes.deleted.map(function (element) {
+                                return <li>{element.path}</li>;
+                            })
+                            }
+                        </ul>
+                        <h3>Added routes:</h3>
+                        <ul>
+                            {responseJson.routes.added.map(function (element) {
+                                return <li>{element.path}</li>;
+                            })
+                            }
+                        </ul>
+                    </div>
                 });
             })
             .catch((error) => {
@@ -190,8 +229,7 @@ class SwaggerEditor extends Component {
     handleSnackbarClose = () => {
         this.setState({
             saved: false,
-            rerouted: false,
-            routes: []
+            rerouted: false
         });
     }
 
@@ -201,19 +239,17 @@ class SwaggerEditor extends Component {
             <FlatButton
                 label="OK"
                 primary={true}
-                keyboardFocused={true}
                 onClick={this.handleDialogClose}
             />,
         ];
         return <div id='swagger-editor-wrapper'>
             <Toolbar>
                 <ToolbarGroup firstChild={true}>
-                    <RaisedButton label="Reload" primary={true} onClick={this.handleClickReload} />
+                    {/* <RaisedButton label="Reload" primary={true} onClick={this.handleClickReload} /> */}
                     <RaisedButton label="Save" primary={true} onClick={this.handleClickSave} />
                 </ToolbarGroup>
                 <ToolbarGroup>
-                    <ToolbarTitle text="Revision" />
-                    {this.state.revision}
+                    Revision: {this.state.revision}
                 </ToolbarGroup>
 
             </Toolbar>
@@ -226,8 +262,7 @@ class SwaggerEditor extends Component {
                 modal={false}
                 open={this.state.dialogOpen}
                 onRequestClose={this.handleDialogClose}>
-                <p>Reason: {this.state.dialogMessage}</p>
-                <p>The editor will attempt to load the last OAS from your local cache.</p>
+                {this.state.dialogMessage}
             </Dialog>
 
             <Snackbar

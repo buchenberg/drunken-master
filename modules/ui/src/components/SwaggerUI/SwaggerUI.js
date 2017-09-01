@@ -3,6 +3,7 @@ import swaggerUI, { presets } from 'swagger-ui';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle } from 'material-ui/Toolbar';
 import 'swagger-ui/dist/swagger-ui.css';
+import './theme-material.css'
 import './SwaggerUI.css';
 
 
@@ -20,7 +21,7 @@ class SwaggerUI extends Component {
     }
     componentDidMount() {
         swaggerUI({
-            dom_id: '#swagger-ui',
+            dom_id: '#oas-ui',
             url: '/oas/json',
             presets: [presets.apis],
         });
@@ -28,7 +29,7 @@ class SwaggerUI extends Component {
 
     handleClickReload = () => {
         swaggerUI({
-            dom_id: '#swagger-ui',
+            dom_id: '#oas-ui',
             url: '/oas/json',
             presets: [presets.apis],
         });
@@ -43,7 +44,7 @@ class SwaggerUI extends Component {
                     <RaisedButton label="Reload" primary={true} onClick={this.handleClickReload}/>
                 </ToolbarGroup>
             </Toolbar>
-            <div id='swagger-ui' />
+            <div id='oas-ui'/>
         </div>;
     }
 }

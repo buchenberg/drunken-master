@@ -30,21 +30,21 @@ class App extends Component {
 
           <AppBar title="Drunken Master"/>
           <Tabs>
-            <Tab label="Swagger Editor" data-route="/home">
+            <Tab label="OAS Editor" data-route="/home">
               <div>
                 <SwaggerEditor></SwaggerEditor>
               </div>
             </Tab>
-            <Tab label="Swagger UI" data-route="/home">
+            <Tab label="OAS UI" data-route="/home">
               <div>
                 <SwaggerUI></SwaggerUI>
               </div>
             </Tab>
-            <Tab label="Other stuff" data-route="/home">
+            {/* <Tab label="Other stuff" data-route="/home">
               <div>
                 More content here:
               </div>
-            </Tab>
+            </Tab> */}
           </Tabs>
         </div>
       </MuiThemeProvider>
