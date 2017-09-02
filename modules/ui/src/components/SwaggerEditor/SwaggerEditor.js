@@ -31,7 +31,6 @@ class SwaggerEditor extends Component {
         };
         // Binding this to that
         this.handleClickSave = this.handleClickSave.bind(this);
-
         this.reroute = this.reroute.bind(this);
         this.loadEditor = this.loadEditor.bind(this);
         this.handleDialogClose = this.handleDialogClose.bind(this);

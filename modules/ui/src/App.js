@@ -37,7 +37,7 @@ class App extends Component {
         <div>
 
           <AppBar
-            title="Drunken Master UI"
+            title="Drunken Master"
             onLeftIconButtonTouchTap={this.toggleNav} />
           <Drawer docked={false} open={this.state.navOpen}>
             <MenuItem onClick={this.toggleNav}>Home</MenuItem>
@@ -56,7 +56,7 @@ class App extends Component {
             </Tab>
             <Tab label="Status" data-route="/home">
               <div className="status-wrapper">
-                <iframe title="status" src="../admin/status"></iframe>
+                <iframe title="status" src="/views/status"></iframe>
               </div>
             </Tab>
           </Tabs>

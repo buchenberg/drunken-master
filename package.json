@@ -45,9 +45,10 @@
         "postinstall": "cd modules/ui && npm i",
         "start": "node server.js",
         "build-ui": "cd modules/ui && npm run build",
-        "dev": "concurrently 'npm run server' 'npm run client'",
-        "client": "cd modules/ui && npm start",
-        "server": "nodemon server.js",
+        "dev": "concurrently 'npm run dev-server' 'npm run dev-client'",
+        "dev-client": "cd modules/ui && npm start",
+        "dev-server": "nodemon server.js",
+        "prod-server": "npm run build-ui && npm start",
         "test": "npm run dredd",
         "dredd": "dredd",
         "lint": "eslint ."

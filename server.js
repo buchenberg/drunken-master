@@ -67,7 +67,7 @@ const manifest = {
                 register: 'hapijs-status-monitor',
                 options: {
                     title: 'Drunken Master Status Monitor',
-                    path: '/admin/status',
+                    path: '/views/status',
                     routeConfig: {
                         auth: false
                     }
