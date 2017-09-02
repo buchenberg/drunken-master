@@ -54,7 +54,7 @@ class App extends Component {
                 <SwaggerUI></SwaggerUI>
               </div>
             </Tab>
-            <Tab label="Status" data-route="/home">
+            <Tab label="Status Monitor" data-route="/home">
               <div className="status-wrapper">
                 <iframe title="status" src="/views/status"></iframe>
               </div>

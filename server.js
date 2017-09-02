@@ -66,7 +66,7 @@ const manifest = {
             plugin: {
                 register: 'hapijs-status-monitor',
                 options: {
-                    title: 'Drunken Master Status Monitor',
+                    title: 'Figaro Server',
                     path: '/views/status',
                     routeConfig: {
                         auth: false

@@ -42,8 +42,9 @@
         "tape": "^4"
     },
     "scripts": {
-        "postinstall": "cd modules/ui && npm i",
+        "postinstall": "npm run install-ui && npm run build-ui",
         "start": "node server.js",
+        "install-ui": "cd modules/ui && npm i",
         "build-ui": "cd modules/ui && npm run build",
         "dev": "concurrently 'npm run dev-server' 'npm run dev-client'",
         "dev-client": "cd modules/ui && npm start",
