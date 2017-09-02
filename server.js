@@ -1,10 +1,13 @@
 'use strict';
 require('dotenv').config();
+require('hapijs-status-monitor');
+
 const Glue = require('glue');
 const Path = require('path');
 const debug = require('debug')('server');
 const Chalk = require('chalk');
 const { Malkoha } = require('malkoha');
+
 
 // Load environmental variables or suitable defaults
 const environment = {
@@ -60,6 +63,18 @@ const manifest = {
             plugin: Malkoha
         },
         {
+            plugin: {
+                register: 'hapijs-status-monitor',
+                options: {
+                    title: 'Drunken Master Status Monitor',
+                    path: '/admin/status',
+                    routeConfig: {
+                        auth: false
+                    }
+                }
+            }
+        },
+        {
             plugin: 'inert'
         },
         {
@@ -84,7 +99,7 @@ const manifest = {
                         password: environment.db.password
                     },
                     baseDir: Path.resolve('./modules/mocks'),
-                    docspath: '/oas'
+                    docspath: '/dapi/oas'
                 }
             }
         },
@@ -101,7 +116,7 @@ const manifest = {
                         password: environment.db.password
                     },
                     baseDir: Path.resolve('./modules/mocks'),
-                    docspath: '/oas'
+                    docspath: '/dapi/oas'
                 }
             }
         },

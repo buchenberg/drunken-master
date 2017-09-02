@@ -4,15 +4,11 @@ import swaggerUI from "swagger-ui";
 import Yaml from "js-yaml";
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
-import IconButton from 'material-ui/IconButton';
-import Dead from 'mui-icons/cmdi/emoticon-dead';
-import ToggleRight from 'mui-icons/fontawesome/toggle-right';
 import Dialog from 'material-ui/Dialog';
 import Snackbar from 'material-ui/Snackbar';
-import { Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle } from 'material-ui/Toolbar';
+import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
 import 'swagger-editor/dist/swagger-editor.css';
-import styles from './SwaggerEditor.css';
-// import 'swagger-editor/dist/swagger-editor.css';
+import './SwaggerEditor.css';
 
 
 
@@ -20,14 +16,14 @@ class SwaggerEditor extends Component {
 
     constructor(props) {
         super(props);
-        this.oasUrl = '/oas';
-        this.oasJsonUrl = '/oas/json';
-        this.oasYamlUrl = '/oas/yaml';
-        this.routeUpdateUrl = '/server';
+        this.oasUrl = '/dapi/oas';
+        this.oasJsonUrl = '/dapi/oas/json';
+        this.oasYamlUrl = '/dapi/oas/yaml';
+        this.routeUpdateUrl = '/dapi/server';
         this.state = {
             oasExists: false,
-            saved: false,
-            revision: '',
+            snackOpen: false,
+            snackMessage: '',
             dialogOpen: false,
             uiOpen: true,
             dialogTitle: '',
@@ -35,18 +31,15 @@ class SwaggerEditor extends Component {
         };
         // Binding this to that
         this.handleClickSave = this.handleClickSave.bind(this);
-        this.handleClickReload = this.handleClickReload.bind(this);
 
         this.reroute = this.reroute.bind(this);
         this.loadEditor = this.loadEditor.bind(this);
         this.handleDialogClose = this.handleDialogClose.bind(this);
-        this.handleToggleRight = this.handleToggleRight.bind(this);
-        this.handleToggleLeft = this.handleToggleLeft.bind(this);
 
     }
 
     checkForOas() {
-        fetch('/status', {
+        fetch('/dapi/status', {
             method: 'GET'
         })
             .then((response) => response.json())
@@ -70,15 +63,17 @@ class SwaggerEditor extends Component {
                 if (responseJson.hasOwnProperty('_rev')) {
                     this.setState({
                         oasExists: true,
-                        revision: responseJson._rev
+                        revision: responseJson._rev,
+                        snackOpen: true,
+                        snackMessage: `loaded rev ${responseJson._rev}`
                     });
                     this.loadEditor();
                 } else {
                     this.setState({
                         oasExists: false,
                         dialogOpen: true,
-                        dialogTitle: 'Error retrieving OAS!',
-                        dialogMessage: responseJson.error
+                        dialogTitle: 'Error loading OpenAPI Specification',
+                        dialogMessage: `There has been an error loading the specification from the database:\nMessage: ${responseJson.error}`
                     });
                 }
 
@@ -87,33 +82,19 @@ class SwaggerEditor extends Component {
                 this.setState({
                     oasExists: false,
                     dialogOpen: true,
-                    dialogTitle: 'Error retrieving OAS!',
-                    dialogMessage: error
+                    dialogTitle: 'Error loading OpenAPI Specification',
+                    dialogMessage: `There has been an error loading the specification from the database:\nMessage: ${error}`
                 });
             });
     }
 
     componentDidMount() {
         this.getOas();
-
     }
-
 
     handleDialogClose = () => {
         this.setState({
             dialogOpen: false
-        });
-    };
-
-    handleToggleRight = () => {
-        this.setState({
-            uiOpen: false
-        });
-    };
-
-    handleToggleLeft = () => {
-        this.setState({
-            uiOpen: true
         });
     };
 
@@ -144,7 +125,8 @@ class SwaggerEditor extends Component {
 
         const isJson = function (doc) {
             try {
-                var json = JSON.parse(doc);
+                // eslint-disable-next-line 
+                let json = JSON.parse(doc);
             } catch (e) {
                 return false;
             }
@@ -174,8 +156,9 @@ class SwaggerEditor extends Component {
             .then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
-                    saved: true,
-                    revision: responseJson.rev
+                    snackOpen: true,
+                    revision: responseJson.rev,
+                    snackMessage: `saved ${responseJson.rev}.`
                 });
                 this.reroute();
             })
@@ -183,11 +166,6 @@ class SwaggerEditor extends Component {
                 console.error(error);
             });
 
-    }
-
-
-    handleClickReload = () => {
-        this.loadEditor();
     }
 
     reroute = () => {
@@ -228,7 +206,7 @@ class SwaggerEditor extends Component {
 
     handleSnackbarClose = () => {
         this.setState({
-            saved: false,
+            snackOpen: false,
             rerouted: false
         });
     }
@@ -242,16 +220,12 @@ class SwaggerEditor extends Component {
                 onClick={this.handleDialogClose}
             />,
         ];
-        return <div id='swagger-editor-wrapper'>
+
+        const swaggerEditor = <div id='swagger-editor-wrapper'>
             <Toolbar>
                 <ToolbarGroup firstChild={true}>
-                    {/* <RaisedButton label="Reload" primary={true} onClick={this.handleClickReload} /> */}
                     <RaisedButton label="Save" primary={true} onClick={this.handleClickSave} />
                 </ToolbarGroup>
-                <ToolbarGroup>
-                    Revision: {this.state.revision}
-                </ToolbarGroup>
-
             </Toolbar>
 
             <div id='swagger-editor' />
@@ -266,12 +240,14 @@ class SwaggerEditor extends Component {
             </Dialog>
 
             <Snackbar
-                open={this.state.saved}
-                message={`Saved ${this.state.revision}.`}
+                open={this.state.snackOpen}
+                message={this.state.snackMessage}
                 autoHideDuration={4000}
                 onRequestClose={this.handleSnackbarClose}
             />
         </div>;
+
+        return swaggerEditor;
     }
 }
 

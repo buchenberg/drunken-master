@@ -14,31 +14,34 @@ const Nano = require('nano');
 
 module.exports = {
     register: function (server, options, next) {
-
+        // Set up couchdb client (nano)
         const dbURL = `http://${options.db.host}:${options.db.port}`;
         log('dbURL: ', dbURL);
         const nano = Nano(dbURL);
         const db = nano.use(options.db.name);
+
         options.basedir = options.basedir || process.cwd();
         options.docspath = options.docspath || '/oas';
         options.cors = {
             origin: ['*']
         };
 
-
         // Get the session token from the cookie string
         const parseSession = function (cookieString) {
             return cookieString.replace(/(?:^AuthSession=)(.*)(;\sV.*)/i, '$1');
         };
 
+        // TODO: This should maybe be a server function?
         // Check to see that the database exists. If not then create it.
         const bootstrapDB = function () {
             nano.db.get(options.db.name, function (err) {
+                // No database yet
                 if (err) {
                     error(`There was an error finding the ${options.db.name} database:\n${err}`);
                     log(`Attempting to create ${options.db.name} database.`);
                     log('Getting admin session.');
                     var token = '';
+                    // Get an admin session to create the database
                     nano.auth(options.db.admin, options.db.password, function (err, body, headers) {
                         if (err) {
                             return error(err);
@@ -46,6 +49,7 @@ module.exports = {
                         if (headers && headers['set-cookie']) {
                             token = parseSession(headers['set-cookie'][0]);
                         }
+                        // Use the token to perform the db creation
                         Nano(
                             {
                                 url: dbURL,
@@ -59,7 +63,10 @@ module.exports = {
                             }
                         });
                     });
-                } else {
+
+                } 
+                // Database already exists
+                else {
                     log(`database ${options.db.name} exists.`);
                 }
             });
@@ -80,7 +87,7 @@ module.exports = {
         // HEALTH ROUTE
         server.route({
             method: 'GET',
-            path: '/health',
+            path: '/dapi/health',
             config: {
                 handler: function (request, reply) {
                     reply(
@@ -94,7 +101,7 @@ module.exports = {
         // Status ROUTE
         server.route({
             method: 'GET',
-            path: '/status',
+            path: '/dapi/status',
             config: {
                 json: {
                     space: 2
@@ -123,7 +130,7 @@ module.exports = {
         });
 
         // OAS Routes
-        // PUT OAS JSON
+        // SAVE OAS
         server.route({
             method: 'PUT',
             path: options.docspath,
@@ -144,20 +151,7 @@ module.exports = {
             },
             vhost: options.vhost
         });
-
-        // Bootstrap the database
-        server.route({
-            method: 'POST',
-            path: options.docspath,
-            config: {
-                handler: function (request, reply) {
-                    bootstrapDB(request, reply);
-                },
-                cors: options.cors
-            },
-            vhost: options.vhost
-        });
-        // GET OAS
+        // GET OAS METADATA
         server.route({
             method: 'GET',
             path: options.docspath,
@@ -183,7 +177,7 @@ module.exports = {
             },
             vhost: options.vhost
         });
-        // GET OAS JSON
+        // GET OAS AS JSON
         server.route({
             method: 'GET',
             path: options.docspath + '/json',
@@ -212,7 +206,7 @@ module.exports = {
             },
             vhost: options.vhost
         });
-        // GET OAS YAML
+        // GET OAS AS YAML
         server.route({
             method: 'GET',
             path: options.docspath + '/yaml',

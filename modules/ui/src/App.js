@@ -1,34 +1,48 @@
 import React, { Component } from 'react';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
+// import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import AppBar from 'material-ui/AppBar';
+import Drawer from 'material-ui/Drawer';
+import MenuItem from 'material-ui/MenuItem';
 import { Tabs, Tab } from 'material-ui/Tabs';
+// import RaisedButton from 'material-ui/RaisedButton';
 
 import SwaggerUI from './components/SwaggerUI/SwaggerUI';
 import SwaggerEditor from './components/SwaggerEditor/SwaggerEditor';
 
 import './App.css';
 
-
-const styles = {
-  headline: {
-    fontSize: 24,
-    paddingTop: 16,
-    marginBottom: 12,
-    fontWeight: 400,
-  },
-};
-
-
-
 class App extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      navOpen: false
+    };
+
+    // Binding this to that
+    this.toggleNav = this.toggleNav.bind(this);
+
+  }
+
+  toggleNav = () => this.setState({ navOpen: !this.state.navOpen });
+
+
+
   render() {
     return (
       <MuiThemeProvider>
         <div>
 
-          <AppBar title="Drunken Master"/>
+          <AppBar
+            title="Drunken Master UI"
+            onLeftIconButtonTouchTap={this.toggleNav} />
+          <Drawer docked={false} open={this.state.navOpen}>
+            <MenuItem onClick={this.toggleNav}>Home</MenuItem>
+            <MenuItem onClick={this.toggleNav}>OAS Tools</MenuItem>
+          </Drawer>
           <Tabs>
             <Tab label="OAS Editor" data-route="/home">
               <div>
@@ -40,11 +54,11 @@ class App extends Component {
                 <SwaggerUI></SwaggerUI>
               </div>
             </Tab>
-            {/* <Tab label="Other stuff" data-route="/home">
-              <div>
-                More content here:
+            <Tab label="Status" data-route="/home">
+              <div className="status-wrapper">
+                <iframe title="status" src="../admin/status"></iframe>
               </div>
-            </Tab> */}
+            </Tab>
           </Tabs>
         </div>
       </MuiThemeProvider>
