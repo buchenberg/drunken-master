@@ -11,7 +11,7 @@ class SwaggerUI extends Component {
 
     constructor(props) {
         super(props);
-        this.oasJsonUrl = '/dapi/oas/json';
+        this.oasJsonUrl = '/api/oas/json';
         this.state = {
             loaded: false
         };

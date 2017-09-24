@@ -16,10 +16,10 @@ class SwaggerEditor extends Component {
 
     constructor(props) {
         super(props);
-        this.oasUrl = '/dapi/oas';
-        this.oasJsonUrl = '/dapi/oas/json';
-        this.oasYamlUrl = '/dapi/oas/yaml';
-        this.routeUpdateUrl = '/dapi/server';
+        this.oasRevisionUrl = '/api/oas/revision';
+        this.oasUrl = '/api/oas';
+        this.oasJsonUrl = '/api/oas/json';
+        this.oasYamlUrl = '/api/oas/yaml';
         this.state = {
             oasExists: false,
             snackOpen: false,
@@ -29,16 +29,14 @@ class SwaggerEditor extends Component {
             dialogTitle: '',
             dialogMessage: ''
         };
-        // Binding this to that
-        this.handleClickSave = this.handleClickSave.bind(this);
-        this.reroute = this.reroute.bind(this);
-        this.loadEditor = this.loadEditor.bind(this);
-        this.handleDialogClose = this.handleDialogClose.bind(this);
-
     }
 
-    checkForOas() {
-        fetch('/dapi/status', {
+    componentDidMount() {
+        this.getOas();
+    }
+
+    checkForOas = () => {
+        fetch('/api/status', {
             method: 'GET'
         })
             .then((response) => response.json())
@@ -53,16 +51,16 @@ class SwaggerEditor extends Component {
 
     }
 
-    getOas() {
-        fetch(this.oasUrl, {
+    getOas = () => {
+        fetch(this.oasRevisionUrl, {
             method: 'GET'
         })
             .then((response) => response.json())
             .then((responseJson) => {
-                if (responseJson.hasOwnProperty('_rev')) {
+                if (responseJson.hasOwnProperty('revision')) {
                     this.setState({
                         oasExists: true,
-                        revision: responseJson._rev,
+                        revision: responseJson.revision,
                         snackOpen: true,
                         snackMessage: `loaded rev ${responseJson._rev}`
                     });
@@ -85,10 +83,6 @@ class SwaggerEditor extends Component {
                     dialogMessage: `There has been an error loading the specification from the database:\nMessage: ${error}`
                 });
             });
-    }
-
-    componentDidMount() {
-        this.getOas();
     }
 
     handleDialogClose = () => {
@@ -157,50 +151,13 @@ class SwaggerEditor extends Component {
                 this.setState({
                     snackOpen: true,
                     revision: responseJson.rev,
-                    snackMessage: `saved ${responseJson.rev}.`
-                });
-                this.reroute();
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-
-    }
-
-    reroute = () => {
-        fetch(this.routeUpdateUrl, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-            .then((response) => response.json())
-            .then((responseJson) => {
-                this.setState({
-                    rerouted: true,
-                    dialogOpen: true,
-                    dialogTitle: 'Drunken Master has been rerouted.',
-                    dialogMessage: <div>
-                        <h3>Deleted routes:</h3>
-                        <ul>
-                            {responseJson.routes.deleted.map(function (element) {
-                                return <li>{element.path}</li>;
-                            })
-                            }
-                        </ul>
-                        <h3>Added routes:</h3>
-                        <ul>
-                            {responseJson.routes.added.map(function (element) {
-                                return <li>{element.path}</li>;
-                            })
-                            }
-                        </ul>
-                    </div>
+                    snackMessage: `Saved ${responseJson.rev}.`
                 });
             })
             .catch((error) => {
                 console.error(error);
             });
+
     }
 
     handleSnackbarClose = () => {

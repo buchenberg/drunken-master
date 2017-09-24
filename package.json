@@ -14,7 +14,6 @@
         "h2o2": "^5.4.0",
         "hapi": "^16.5.2",
         "hapi-swaggered-ui": "github:buchenberg/hapi-swaggered-ui",
-        "hapijs-status-monitor": "^0.6.0",
         "inert": "^4.1.0",
         "malkoha": "github:buchenberg/malkoha",
         "nano": "^6.4.0",

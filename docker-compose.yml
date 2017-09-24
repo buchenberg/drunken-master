@@ -6,7 +6,7 @@ services:
       # dockerfile: ./.docker/db/Dockerfile
     container_name: drunken-master-db
     ports:
-    - "5985:5984"
+    - "5984:5984"
     volumes:
       - ./.docker/db/logs:/usr/local/var/log/couchdb
     # volumes:
@@ -18,7 +18,8 @@ services:
     env_file: ./.docker/web/.env
     container_name: drunken-master
     ports:
-    - "9990:9999"
+    - "9999:9999"
+    - "3000:3000"
     links:
     - db
     volumes:
