@@ -2,7 +2,7 @@
   "name": "ui",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "/ui/.",
   "proxy": "http://localhost:9999/",
   "dependencies": {
     "deepmerge": "^1.5.1",
