@@ -1,10 +1,13 @@
 'use strict';
 require('dotenv').config();
+require('hapijs-status-monitor');
+
 const Glue = require('glue');
 const Path = require('path');
 const debug = require('debug')('server');
 const Chalk = require('chalk');
 const { Malkoha } = require('malkoha');
+
 
 // Load environmental variables or suitable defaults
 const environment = {
@@ -13,7 +16,9 @@ const environment = {
         host: process.env.DB_HOST || 'localhost',
         port: process.env.DB_PORT || 5984,
         name: process.env.DB_NAME || 'oas',
-        docname: process.env.DB_DOC_NAME || 'spec'
+        docname: process.env.DB_DOC_NAME || 'spec',
+        admin: process.env.DB_ADMIN_NAME,
+        password: process.env.DB_ADMIN_PASSWORD
     },
     api: {
         host: process.env.API_HOST || 'localhost',
@@ -45,6 +50,9 @@ const manifest = {
             routes: {
                 cors: {
                     origin: ['*']
+                },
+                files: {
+                    relativeTo: Path.join(__dirname, 'modules/ui/build')
                 }
             }
 
@@ -53,6 +61,18 @@ const manifest = {
     registrations: [
         {
             plugin: Malkoha
+        },
+        {
+            plugin: {
+                register: 'hapijs-status-monitor',
+                options: {
+                    title: 'Figaro Server',
+                    path: '/views/status',
+                    routeConfig: {
+                        auth: false
+                    }
+                }
+            }
         },
         {
             plugin: 'inert'
@@ -74,10 +94,39 @@ const manifest = {
                         host: environment.db.host,
                         port: environment.db.port,
                         name: environment.db.name,
-                        document: environment.db.docname
+                        document: environment.db.docname,
+                        admin: environment.db.admin,
+                        password: environment.db.password
                     },
                     baseDir: Path.resolve('./modules/mocks'),
-                    docspath: '/oas'
+                    docspath: '/dapi/oas'
+                }
+            }
+        },
+        {
+            plugin: {
+                register: './modules/routes',
+                options: {
+                    db: {
+                        host: environment.db.host,
+                        port: environment.db.port,
+                        name: environment.db.name,
+                        document: environment.db.docname,
+                        admin: environment.db.admin,
+                        password: environment.db.password
+                    },
+                    baseDir: Path.resolve('./modules/mocks'),
+                    docspath: '/dapi/oas'
+                }
+            }
+        },
+        {
+            plugin: {
+                register: './modules/ui',
+                options: {
+                    cors: {
+                        origin: ['*']
+                    }
                 }
             }
         }
@@ -95,5 +144,11 @@ Glue.compose(manifest, options, (err, server) => {
     server.start(() => {
         server.plugins.mocks.setHost(server.info.host + ':' + server.info.port);
         debug(`Drunken Master is running on ${Chalk.cyan(Chalk.underline(server.info.uri))}`);
+        debug('Static Routes:');
+        var staticRoutes = server.table()[0].table;
+        staticRoutes.forEach((route) => debug(`\t${route.method}\t${route.path}`));
+        debug('Dynamic Routes:');
+        var dynamicRoutes = server.malkoha._routes;
+        dynamicRoutes.forEach((route) => debug(`\t${route.method}\t${route.path}`));
     });
 });

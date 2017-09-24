@@ -1,0 +1,28 @@
+version: '3'
+services:
+  db:
+    build:
+      context: ./.docker/db/
+      # dockerfile: ./.docker/db/Dockerfile
+    container_name: drunken-master-db
+    ports:
+    - "5985:5984"
+    volumes:
+      - ./.docker/db/logs:/usr/local/var/log/couchdb
+    # volumes:
+    # - db-data:/usr/local/var/lib/couchdb
+  web:
+    build:
+      context: .
+      dockerfile: ./.docker/web/Dockerfile
+    env_file: ./.docker/web/.env
+    container_name: drunken-master
+    ports:
+    - "9990:9999"
+    links:
+    - db
+    volumes:
+      - .:/usr/src/app
+    command: 'npm run dev'
+# volumes:
+#   db-data:

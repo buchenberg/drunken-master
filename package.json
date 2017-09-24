@@ -14,11 +14,13 @@
         "h2o2": "^5.4.0",
         "hapi": "^16.5.2",
         "hapi-swaggered-ui": "github:buchenberg/hapi-swaggered-ui",
+        "hapijs-status-monitor": "^0.6.0",
         "inert": "^4.1.0",
-        "malkoha": "^0.0.3",
+        "malkoha": "github:buchenberg/malkoha",
         "nano": "^6.4.0",
         "react": "^15.6.1",
         "react-dom": "^15.6.1",
+        "react-router-dom": "^4.2.2",
         "swaggerize-hapi": "^2.0.1",
         "swaggerize-routes": "github:buchenberg/swaggerize-routes",
         "swagmock": "github:buchenberg/swagmock",
@@ -27,6 +29,7 @@
         "zone.js": "^0.8.16"
     },
     "devDependencies": {
+        "concurrently": "^3.5.0",
         "dredd": "^3.4.3",
         "eslint": "^3.19.0",
         "generator-powdered-toast": "^1.0.0",
@@ -39,13 +42,14 @@
         "tape": "^4"
     },
     "scripts": {
-        "postinstall": "cd modules/ui && yarn",
+        "postinstall": "npm run install-ui && npm run build-ui",
         "start": "node server.js",
-        "dev": "nodemon server.js",
-        "prebuild:client": "rm -rf modules/public/*",
-        "build:client": "cd modules/ui && yarn build",
-        "postbuild:client": "cp -rv modules/ui/build/* modules/public",
-        "serve:client": "cd modules/ui && yarn start",
+        "install-ui": "cd modules/ui && npm i",
+        "build-ui": "cd modules/ui && npm run build",
+        "dev": "concurrently 'npm run dev-server' 'npm run dev-client'",
+        "dev-client": "cd modules/ui && npm start",
+        "dev-server": "nodemon server.js",
+        "prod-server": "npm run build-ui && npm start",
         "test": "npm run dredd",
         "dredd": "dredd",
         "lint": "eslint ."
