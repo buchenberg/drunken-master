@@ -54,63 +54,70 @@ module.exports.register = function (server, options, next) {
             db.insert(obj, key, callback);
         });
     };
-    // Initialize dynamic routes
-    db.get(options.db.document, function (err, body) {
-        if (body && body.spec) {
-            options.api = body.spec;
-        } else {
-            Error(Chalk.red('No spec found! Check your DB.'));
-            options.api = {};
-        }
 
-        if (Thing.isString(options.api)) {
-            options.api = internals.loadApi(options.api);
-        }
-
-        Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
-
-        if (options.api.hasOwnProperty('basePath')) {
-            options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
-            basePath = Utils.unsuffix(options.api.basePath, '/');
-
-            //Build routes
-            routes = builder({
-                'baseDir': options.baseDir,
-                'api': options.api,
-                'schema-extensions': true,
-                'defaulthandler': defaulthandler
-            });
-
-            //Add dynamic routes
-            routes.forEach(function (route) {
-                // Define the dynamic route
-                server.malkoha.route({
-                    method: route.method,
-                    path: basePath + route.path,
-                    vhost: options.vhost,
-                    config: {
-                        handler: route.handler,
-                        cors: options.cors
-                    }
-                });
-            });
-        } else {
-            options.api.basePath = '/';
-        }
-
-
-        //Expose plugin api
-        server.expose({
-            api: options.api,
-            setHost: function setHost(host) {
-                this.api.host = options.api.host = host;
+    const init = function () {
+        // Initialize dynamic routes
+        db.get(options.db.document, function (err, body) {
+            if (body && body.spec) {
+                options.api = body.spec;
+            } else {
+                Error(Chalk.red('No spec found! Check your DB.'));
+                options.api = {};
             }
+
+            if (Thing.isString(options.api)) {
+                options.api = internals.loadApi(options.api);
+            }
+
+            Assert.ok(Thing.isObject(options.api), 'Api definition must resolve to an object.');
+
+            if (options.api.hasOwnProperty('basePath')) {
+                options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
+                basePath = Utils.unsuffix(options.api.basePath, '/');
+
+                //Build routes
+                routes = builder({
+                    'baseDir': options.baseDir,
+                    'api': options.api,
+                    'schema-extensions': true,
+                    'defaulthandler': defaulthandler
+                });
+
+                //Add dynamic routes
+                routes.forEach(function (route) {
+                    // Define the dynamic route
+                    server.malkoha.route({
+                        method: route.method,
+                        path: basePath + route.path,
+                        vhost: options.vhost,
+                        config: {
+                            handler: route.handler,
+                            cors: options.cors
+                        }
+                    });
+                });
+            } else {
+                options.api.basePath = '/';
+            };
+
+
+            //Expose plugin api
+            server.expose({
+                api: options.api,
+                setHost: function setHost(host) {
+                    this.api.host = options.api.host = host;
+                }
+            });
+
+            //Done
+            next();
+
         });
 
-        //Done
-        next();
+    }
 
-    });
+    init();
+
 };
 
 module.exports.register.attributes = {
