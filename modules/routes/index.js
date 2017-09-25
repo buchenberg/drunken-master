@@ -128,8 +128,10 @@ module.exports = {
                             reply({ error: err });
                         } else {
                             server.plugins.sockets.updateRevision(res.rev)
+                            log('calling update routes')
                             server.plugins.mocks.updateRoutes()
-                            reply('OK');
+                            reply(res)
+                            .code(200);
                         }
 
                     });

@@ -5,6 +5,8 @@ const error = debug('mocks:error');
 const log = debug('mocks:log');
 log.log = console.log.bind(console);
 
+const Promise = require("bluebird");
+
 var Assert = require('assert');
 var Thing = require('core-util-is');
 var builder = require('swaggerize-routes');
@@ -16,7 +18,6 @@ const Chalk = require('chalk');
 const Error = debug('mocks:error');
 const Log = debug('mocks:log');
 
-var routes = null;
 
 const internals = {};
 
@@ -25,6 +26,7 @@ internals.loadApi = function (api) {
 };
 
 module.exports.register = function (server, options, next) {
+    var routes;
     var basePath;
     Assert.ok(Thing.isObject(options), 'Expected options to be an object.');
     const dbURL = `http://${options.db.host}:${options.db.port}`;
@@ -36,7 +38,7 @@ module.exports.register = function (server, options, next) {
     options.cors = {
         origin: ['*']
     };
-    
+
     // Default mock handler
     const defaulthandler = function (request, reply) {
         let path = request.route.path.replace(options.api.basePath, '');
@@ -90,26 +92,26 @@ module.exports.register = function (server, options, next) {
             } else {
                 options.api.basePath = '/';
             };
-            
+
         });
 
     }
 
     const deleteRoutes = function () {
-        routes.forEach(function (route) {
-            console.log(`deleting ${route.method} ${route.path}`)
-            return server.malkoha.delete({
-                method: route.method,
-                path: basePath + route.path,
-            });
-        });
-        routes = null;
+        return server.dynaroute.delete(routes)
     }
 
     const createRoutes = function () {
-        routes.forEach(function (route) {
-            console.log(`creating ${route.method} ${route.path}`)
-            return server.malkoha.route({
+        var mroutes = [];
+        var swaggerRoutes = builder({
+            'baseDir': options.baseDir,
+            'api': options.api,
+            'schema-extensions': true,
+            'defaulthandler': defaulthandler
+        })
+        return Promise.each(swaggerRoutes, route => {
+            log(`creating ${route.method} ${route.path}`)
+            mroutes.push({
                 method: route.method,
                 path: basePath + route.path,
                 vhost: options.vhost,
@@ -118,32 +120,43 @@ module.exports.register = function (server, options, next) {
                     cors: options.cors
                 }
             });
-        });
-        server.plugins.sockets.updateRoutes(server.malkoha._routes)
-        server.malkoha._routes
-        next();
+        }).then(() => {
+            routes = mroutes
+            server.dynaroute.route(routes)
+            log('routes created:', mroutes.length)
+            server.plugins.sockets.updateRoutes(routes)
+            return Promise.resolve()
+        })
+        
     }
 
     const updateRoutes = () => {
         if (routes) {
-            deleteRoutes(routes);
+            log('found routes')
+            deleteRoutes();
+        } else {
+            log('found no routes')  
         }
-        // routes = rts
-        routes = builder({
-            'baseDir': options.baseDir,
-            'api': options.api,
-            'schema-extensions': true,
-            'defaulthandler': defaulthandler
-        });
-        //Add dynamic routes
-        createRoutes();
+        createRoutes().then(() => {
+            //Add dynamic routes
+           log('routes done')
+           var dynamicRoutes = server.dynaroute._routes;
+           dynamicRoutes.forEach((route) => log(`\t${route.method}\t${route.path}`));
+           next();
+        })
     }
 
-    server.expose('updateRoutes', function () { return updateRoutes(); });
+    server.expose({
+        api: options.api
+    });
+
+    server.expose('updateRoutes', function () {
+        log('update routes called')
+        return initRoutes();
+    });
 
     initRoutes();
 
-    next();
 };
 
 module.exports.register.attributes = {

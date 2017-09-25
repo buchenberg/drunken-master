@@ -8,7 +8,7 @@ const error = debug('server:error');
 const log = debug('server:log');
 log.log = console.log.bind(console);
 const Chalk = require('chalk');
-const { Malkoha } = require('malkoha');
+const { DynaRoute } = require('./modules/dyna-route');
 const Nano = require('nano');
 const Petstore = require('./petstore.json');
 
@@ -111,12 +111,11 @@ const manifest = {
                     relativeTo: Path.join(__dirname, 'modules/ui/build')
                 }
             }
-
         }
     ],
     registrations: [
         {
-            plugin: Malkoha
+            plugin: DynaRoute
         },
         {
             plugin: 'inert'
@@ -200,7 +199,7 @@ Glue.compose(manifest, options, (err, server) => {
         var staticRoutes = server.table()[0].table;
         staticRoutes.forEach((route) => log(`\t${route.method}\t${route.path}`));
         log('Dynamic Routes:');
-        var dynamicRoutes = server.malkoha._routes;
+        var dynamicRoutes = server.dynaroute._routes;
         dynamicRoutes.forEach((route) => log(`\t${route.method}\t${route.path}`));
     });
 });
