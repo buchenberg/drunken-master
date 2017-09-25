@@ -1,5 +1,10 @@
 'use strict';
+//DEBUGGING
 const debug = require('debug');
+const error = debug('mocks:error');
+const log = debug('mocks:log');
+log.log = console.log.bind(console);
+
 var Assert = require('assert');
 var Thing = require('core-util-is');
 var builder = require('swaggerize-routes');
@@ -11,6 +16,8 @@ const Chalk = require('chalk');
 const Error = debug('mocks:error');
 const Log = debug('mocks:log');
 
+var routes = null;
+
 const internals = {};
 
 internals.loadApi = function (api) {
@@ -18,7 +25,7 @@ internals.loadApi = function (api) {
 };
 
 module.exports.register = function (server, options, next) {
-    var routes, basePath;
+    var basePath;
     Assert.ok(Thing.isObject(options), 'Expected options to be an object.');
     const dbURL = `http://${options.db.host}:${options.db.port}`;
     Log('dbURL: ', Chalk.blue(dbURL));
@@ -29,6 +36,7 @@ module.exports.register = function (server, options, next) {
     options.cors = {
         origin: ['*']
     };
+    
     // Default mock handler
     const defaulthandler = function (request, reply) {
         let path = request.route.path.replace(options.api.basePath, '');
@@ -55,7 +63,7 @@ module.exports.register = function (server, options, next) {
         });
     };
 
-    const init = function () {
+    const initRoutes = function () {
         // Initialize dynamic routes
         db.get(options.db.document, function (err, body) {
             if (body && body.spec) {
@@ -74,50 +82,68 @@ module.exports.register = function (server, options, next) {
             if (options.api.hasOwnProperty('basePath')) {
                 options.api.basePath = Utils.prefix(options.api.basePath || '/', '/');
                 basePath = Utils.unsuffix(options.api.basePath, '/');
-
-                //Build routes
-                routes = builder({
-                    'baseDir': options.baseDir,
-                    'api': options.api,
-                    'schema-extensions': true,
-                    'defaulthandler': defaulthandler
-                });
-
-                //Add dynamic routes
-                routes.forEach(function (route) {
-                    // Define the dynamic route
-                    server.malkoha.route({
-                        method: route.method,
-                        path: basePath + route.path,
-                        vhost: options.vhost,
-                        config: {
-                            handler: route.handler,
-                            cors: options.cors
-                        }
-                    });
+                updateRoutes();
+                //Expose plugin api
+                server.expose({
+                    api: options.api
                 });
             } else {
                 options.api.basePath = '/';
             };
-
-
-            //Expose plugin api
-            server.expose({
-                api: options.api,
-                setHost: function setHost(host) {
-                    this.api.host = options.api.host = host;
-                }
-            });
-
-            //Done
-            next();
-
+            
         });
 
     }
 
-    init();
+    const deleteRoutes = function () {
+        routes.forEach(function (route) {
+            console.log(`deleting ${route.method} ${route.path}`)
+            return server.malkoha.delete({
+                method: route.method,
+                path: basePath + route.path,
+            });
+        });
+        routes = null;
+    }
 
+    const createRoutes = function () {
+        routes.forEach(function (route) {
+            console.log(`creating ${route.method} ${route.path}`)
+            return server.malkoha.route({
+                method: route.method,
+                path: basePath + route.path,
+                vhost: options.vhost,
+                config: {
+                    handler: route.handler,
+                    cors: options.cors
+                }
+            });
+        });
+        server.plugins.sockets.updateRoutes(server.malkoha._routes)
+        server.malkoha._routes
+        next();
+    }
+
+    const updateRoutes = () => {
+        if (routes) {
+            deleteRoutes(routes);
+        }
+        // routes = rts
+        routes = builder({
+            'baseDir': options.baseDir,
+            'api': options.api,
+            'schema-extensions': true,
+            'defaulthandler': defaulthandler
+        });
+        //Add dynamic routes
+        createRoutes();
+    }
+
+    server.expose('updateRoutes', function () { return updateRoutes(); });
+
+    initRoutes();
+
+    next();
 };
 
 module.exports.register.attributes = {

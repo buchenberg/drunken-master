@@ -90,19 +90,9 @@ const bootstrapDB = function () {
         // Database already exists
         else {
             log(`database ${environment.db.name} exists.`);
-            // var database = nano.use(environment.db.name);
-            // database.insert({ happy: true }, 'oas', function(err, body) {
-            //     if (err) {
-            //         error(err)
-            //     }
-            //     else
-            //     log(body);
-            // });
         }
     });
 };
-
-
 
 
 const manifest = {
@@ -128,18 +118,6 @@ const manifest = {
         {
             plugin: Malkoha
         },
-        // {
-        //     plugin: {
-        //         register: 'hapijs-status-monitor',
-        //         options: {
-        //             title: 'Drunken Master Server',
-        //             path: '/views/status',
-        //             routeConfig: {
-        //                 auth: false
-        //             }
-        //         }
-        //     }
-        // },
         {
             plugin: 'inert'
         },
@@ -151,6 +129,11 @@ const manifest = {
         // },
         {
             plugin: 'h2o2'
+        },
+        {
+            plugin: {
+                register: './modules/sockets'
+            }
         },
         {
             plugin: {
@@ -211,7 +194,7 @@ Glue.compose(manifest, options, (err, server) => {
         throw err;
     }
     server.start(() => {
-        server.plugins.mocks.setHost(server.info.host + ':' + server.info.port);
+       // server.plugins.mocks.setHost(server.info.host + ':' + server.info.port);
         log(`Drunken Master is running on ${Chalk.cyan(Chalk.underline(server.info.uri))}`);
         log('Static Routes:');
         var staticRoutes = server.table()[0].table;

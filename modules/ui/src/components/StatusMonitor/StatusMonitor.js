@@ -6,8 +6,10 @@ import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import Snackbar from 'material-ui/Snackbar';
 import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
+import socketIOClient from "socket.io-client";
 import './StatusMonitor.css';
 
+const socket = socketIOClient("http://127.0.0.1:9999");
 
 
 class StatusMonitor extends Component {
@@ -21,6 +23,7 @@ class StatusMonitor extends Component {
         this.state = {
             oas: false,
             revision: '',
+            connections: 0,
             static_routes: [],
             dynamic_routes: [],
 
@@ -47,8 +50,23 @@ class StatusMonitor extends Component {
 
     }
 
+    emitSomething = (msg) => {
+        socket.emit('client message', msg)
+    }
+
     componentDidMount() {
         this.getOasStatus();
+        socket.on("revision", data => {
+            console.log('Got a new revision from socket.io')
+            this.setState({ revision: data });
+        });
+        socket.on("dynamic_routes", data => {
+            console.log('got a route update.', data)
+            this.setState({ dynamic_routes: data });
+        });
+        socket.on("connections", data => {
+            this.setState({ connections: data });
+        });
     }
 
     render() {
@@ -63,16 +81,19 @@ class StatusMonitor extends Component {
 
                 <div id='status-monitor'>
                     <Card>
-                        <CardTitle title="OAS Status" />
+                        <CardTitle title="Server Status" />
                         <CardText>
+                            <p>
+                                Connections: {this.state.connections}
+                            </p>
                             {this.state.oas ? (
-                                <h3>
-                                    Revision {this.state.revision} loaded.
-                                </h3>
+                                <p>
+                                    OAS revision {this.state.revision} loaded.
+                                </p>
                             ) : (
-                                <h3>
-                                    Revision {this.state.revision} loaded.
-                                </h3>
+                                <p>
+                                    OAS revision {this.state.revision} loaded.
+                                </p>
                                 )}
                         </CardText>
                     </Card>
@@ -89,10 +110,6 @@ class StatusMonitor extends Component {
                                 <p key={index}>{route.method} {route.path}</p>
                             ))}
                         </CardText>
-                        <CardActions>
-                            <FlatButton label="Action1" />
-                            <FlatButton label="Action2" />
-                        </CardActions>
                     </Card>
                 </div>
             </div>;

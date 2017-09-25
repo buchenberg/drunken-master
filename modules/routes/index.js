@@ -1,8 +1,8 @@
 'use strict';
 //DEBUGGING
 const debug = require('debug');
-const error = debug('monitor:error');
-const log = debug('monitor:log');
+const error = debug('routes:error');
+const log = debug('routes:log');
 log.log = console.log.bind(console);
 
 const Yaml = require('js-yaml');
@@ -62,7 +62,6 @@ module.exports = {
 
                     server.table()[0].table.map(
                         function (route) {
-                            log(server.info)
                             staticRoutes.push({
                                 route: route.info,
                                 method: route.method,
@@ -128,7 +127,9 @@ module.exports = {
                         if (err) {
                             reply({ error: err });
                         } else {
-                            reply(res);
+                            server.plugins.sockets.updateRevision(res.rev)
+                            server.plugins.mocks.updateRoutes()
+                            reply('OK');
                         }
 
                     });
