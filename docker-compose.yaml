@@ -1,19 +1,36 @@
 version: '3'
 services:
   db:
-    image: couchdb:1.6.1
+    build:
+      context: .
+      dockerfile: ./.docker/db/Dockerfile
     container_name: drunken-master-db
     ports:
-    - "5984:5984"
-    volumes:
-    - db-data:/usr/local/var/lib/couchdb
+     - "5984:5984"
   web:
-    build: .
-    env_file: ./.docker/.env
+    build:
+      context: .
+      dockerfile: ./.docker/web/Dockerfile
+    environment:
+      - DEBUG=server,mocks,routes,proxy
+      - API_HOST=localhost
+      - API_PORT=9999
+      - DB_HOST=db
+      - DB_PORT=5984
+      - DB_NAME=oas-dev
+      - DB_DOC_NAME=spec
+      - DB_ADMIN_NAME=admin
+      - DB_ADMIN_PASSWORD=password
+      - PROXY_UPSTREAM_PROTOCOL=https
+      - PROXY_UPSTREAM_HOST=api.example.com
+      - PROXY_HOST_HEADER=dev.example.com
     container_name: drunken-master
     ports:
-    - "9999:9999"
+      - 9999:9999
+      - 3000:3000
+      - 5858:5858
     links:
-    - db
-volumes:
-  db-data:
+      - db
+    volumes:
+      - .:/usr/src/app
+    command: 'npm run dev'
