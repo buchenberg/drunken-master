@@ -112,8 +112,8 @@ const manifest = {
                 register: './lib/proxy',
                 options: {
                     upstream_protocol: process.env.PROXY_UPSTREAM_PROTOCOL || 'https',
-                    upstream_url: process.env.PROXY_UPSTREAM_HOST || 'public.example.net',
-                    proxy_host_header: process.env.PROXY_HOST_HEADER || 'local.example.net',
+                    upstream_url: process.env.PROXY_UPSTREAM_HOST || 'public.dev-spectrum.net',
+                    proxy_host_header: process.env.PROXY_HOST_HEADER || 'figaro.dev-spectrum.net',
                 },
             },
         },
