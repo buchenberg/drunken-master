@@ -98,21 +98,11 @@ const manifest = {
         },
         {
             plugin: {
-                register: './lib/uber-mocks',
+                register: './lib/mocks',
                 options: {
-                    baseDir: Path.resolve('./lib/uber-mocks'),
+                    baseDir: Path.resolve('./lib/mocks'),
                     docspath: '/docs',
                 },
-            }
-        },
-        {
-            plugin: {
-                register: './lib/api'
-            },
-            options: {
-                routes: {
-                    prefix: '/drunken-master/api'
-                } 
             }
         },
         {
