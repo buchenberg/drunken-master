@@ -8,7 +8,6 @@ const debug = require('debug')('server');
 const Chalk = require('chalk');
 const fetch = require('node-fetch');
 const base64 = require('base-64');
-const API = require('./lib/api.json');
 
 const nyan = `
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -39,14 +38,6 @@ $$$$$$$$$$$$$$$$$$$$$$$  ;;;;                                       :::::::::::
 // Load environmental variables or suitable defaults
 const environment = {
     tls: process.env.TLS || false,
-    db: {
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 5984,
-        name: process.env.DB_NAME || 'oas',
-        docname: process.env.DB_DOC_NAME || 'spec',
-        admin: process.env.DB_ADMIN_NAME,
-        password: process.env.DB_ADMIN_PASSWORD,
-    },
     api: {
         host: process.env.API_HOST || 'localhost',
         port: process.env.API_PORT || 9990,
@@ -97,18 +88,6 @@ const manifest = {
         },
         {
             plugin: {
-                register: 'hapijs-status-monitor',
-                options: {
-                    title: 'Figaro Server',
-                    path: '/views/status',
-                    routeConfig: {
-                        auth: false,
-                    },
-                },
-            },
-        },
-        {
-            plugin: {
                 register: './lib/proxy',
                 options: {
                     upstream_protocol: process.env.PROXY_UPSTREAM_PROTOCOL || 'https',
@@ -119,38 +98,22 @@ const manifest = {
         },
         {
             plugin: {
-                register: './lib/mocks',
+                register: './lib/uber-mocks',
                 options: {
-                    db: {
-                        host: environment.db.host,
-                        port: environment.db.port,
-                        name: environment.db.name,
-                        document: environment.db.docname,
-                        admin: environment.db.admin,
-                        password: environment.db.password,
-                    },
-                    baseDir: Path.resolve('./lib/mocks'),
-                    docspath: '/dapi/oas',
+                    baseDir: Path.resolve('./lib/uber-mocks'),
+                    docspath: '/docs',
                 },
-            },
+            }
         },
         {
             plugin: {
-                register: './lib/routes',
-                options: {
-                    db: {
-                        host: environment.db.host,
-                        port: environment.db.port,
-                        name: environment.db.name,
-                        document: environment.db.docname,
-                        admin: environment.db.admin,
-                        password: environment.db.password,
-                    },
-                    baseDir: Path.resolve('./lib/mocks'),
-                    docspath: '/dapi/oas',
-                    handlers: Path.resolve('./lib/mocks/handlers'),
-                },
+                register: './lib/api'
             },
+            options: {
+                routes: {
+                    prefix: '/drunken-master/api'
+                } 
+            }
         },
         {
             plugin: {
@@ -178,7 +141,7 @@ const startServer = function() {
         let today = new Date();
 
         server.start(() => {
-            server.plugins.mocks.setHost(server.info.host + ':' + server.info.port);
+            //server.plugins.mocks.setHost(server.info.host + ':' + server.info.port);
             debug(`${nyan}
                 ** ${today.toTimeString()} **
                      Nyan! So much hapi.
@@ -191,47 +154,4 @@ const startServer = function() {
     });
 };
 
-// Check to see that the database exists. If not then create it.
-const boot = function() {
-    fetch(`http://${environment.db.host}:${environment.db.port}/${environment.db.name}`, {
-        method: 'PUT',
-        headers: {'Authorization': 'Basic ' + base64.encode(`${environment.db.admin}:${environment.db.password}`)},
-    }).then(function(response) {
-        return response.json();
-    }).then(function(json) {
-        if (json.error) {
-            switch (json.error) {
-            case 'file_exists':
-                debug(`Database ${environment.db.name} already exists`);
-                startServer();
-                break;
-            default:
-                debug(`Database ${environment.db.name} not created`, json.error);
-                break;
-            }
-        } else {
-            debug(`New ${environment.db.name} database created. Seeding with petstore API..`);
-            fetch(`http://${environment.db.host}:${environment.db.port}/${environment.db.name}/${environment.db.docname}`,
-                {
-                    method: 'PUT',
-                    body: JSON.stringify({
-                        spec: API,
-                    }),
-                })
-                .then(function(response) {
-                    return response.json();
-                }).then(function(json) {
-                    if (json.id) {
-                        debug(`${json.id} document created at revision ${json.rev}.`);
-                        startServer();
-                    } else {
-                        debug('response', json);
-                    }
-                });
-        }
-    }).catch(function(err) {
-        debug(err);
-    });
-};
-
-boot();
+startServer();
