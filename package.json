@@ -25,7 +25,7 @@
         "swaggerize-routes": "github:buchenberg/swaggerize-routes",
         "uuid": "^3.1.0",
         "vision": "^4.1.1",
-        "x-mock": "^1.0.3",
+        "x-mock": "^2.0.0",
         "zone.js": "^0.8.18"
     },
     "devDependencies": {

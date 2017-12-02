@@ -5,9 +5,6 @@ require('hapijs-status-monitor');
 const Glue = require('glue');
 const Path = require('path');
 const debug = require('debug')('server');
-const Chalk = require('chalk');
-const fetch = require('node-fetch');
-const base64 = require('base-64');
 
 const nyan = `
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -136,7 +133,7 @@ const startServer = function() {
                 ** ${today.toTimeString()} **
                      Nyan! So much hapi.
                     `);
-            debug(`Drunken Master is running on ${Chalk.cyan(Chalk.underline(server.info.uri))}`);
+            debug(`Drunken Master is running on ${server.info.uri}`);
             debug('Static Routes:');
             let staticRoutes = server.table()[0].table;
             staticRoutes.forEach((route) => debug(`\t${route.method}\t${route.path}`));
