@@ -13,7 +13,7 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "host": "petstore.swagger.io",
+  "host": "localhost:9999",
   "basePath": "/v2",
   "tags": [
     {
@@ -900,7 +900,16 @@
       "properties": {
         "id": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 11,
+          "x-example": 12,
+          "x-mock": {
+            "function": "natural",
+            "options": {
+              "min": 1,
+              "max": 10
+            }
+          }
         },
         "name": {
           "type": "string"
@@ -969,14 +978,16 @@
       "properties": {
         "id": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": "1"
         },
         "category": {
           "$ref": "#/definitions/Category"
         },
         "name": {
           "type": "string",
-          "example": "doggie"
+          "example": "doggie",
+          "x-example": "fido"
         },
         "photoUrls": {
           "type": "array",
