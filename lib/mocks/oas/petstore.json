@@ -959,10 +959,21 @@
       "properties": {
         "id": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "x-mock": {
+            "function": "natural",
+            "options":{
+              "min": 1,
+              "max": 99
+            }
+          }
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "example": "dog",
+          "x-mock":{
+            "function": "tag_name"
+          }
         }
       },
       "xml": {
@@ -987,7 +998,10 @@
         "name": {
           "type": "string",
           "example": "doggie",
-          "x-example": "fido"
+          "x-example": "fido",
+          "x-mock": {
+            "function": "pet_name"
+          }
         },
         "photoUrls": {
           "type": "array",
@@ -996,7 +1010,10 @@
             "wrapped": true
           },
           "items": {
-            "type": "string"
+            "type": "string",
+            "x-mock": {
+              "function": "photo_urls"
+            }
           }
         },
         "tags": {
