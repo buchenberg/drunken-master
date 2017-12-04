@@ -5,10 +5,10 @@
 		"version": "1.0.0",
 		"title": "Uber API"
 	},
-	"host": "api.uber.com",
+	"host": "localhost:9999",
 	"basePath": "/v1",
 	"schemes": [
-		"https"
+		"http"
 	],
 	"produces": [
 		"application/json"

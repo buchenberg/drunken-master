@@ -962,7 +962,7 @@
           "format": "int64",
           "x-mock": {
             "function": "natural",
-            "options":{
+            "options": {
               "min": 1,
               "max": 99
             }
@@ -971,7 +971,7 @@
         "name": {
           "type": "string",
           "example": "dog",
-          "x-mock":{
+          "x-mock": {
             "function": "tag_name"
           }
         }
@@ -1000,7 +1000,10 @@
           "example": "doggie",
           "x-example": "fido",
           "x-mock": {
-            "function": "pet_name"
+            "function": "pet_name",
+            "options": {
+              "prefix": "junior"
+            }
           }
         },
         "photoUrls": {
@@ -1013,7 +1016,17 @@
             "type": "string",
             "x-mock": {
               "function": "photo_urls"
-            }
+            },
+            "x-scenarios": [
+              { 
+                "name": "scene_1",
+                "example": "foo"
+              },
+              { 
+                "name": "scene_2",
+                "example": "bar"
+              }
+            ]
           }
         },
         "tags": {
