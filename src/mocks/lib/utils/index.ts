@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = {
+const utils = {
 
     verbs: [
         'get',
@@ -66,3 +64,5 @@ module.exports = {
         return str;
     },
 };
+
+export default utils;

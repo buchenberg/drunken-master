@@ -1,6 +1,6 @@
 const Chance = require('chance').Chance();
 
-module.exports = [
+const mixins = [
     {
         'pet_name': function ({ prefix }) {
             let name = Chance.pickone(['fluffy', 'fido', 'spot', 'cosmo']);
@@ -14,9 +14,11 @@ module.exports = [
     },
     {
         'photo_urls': function () {
-            myArray = Chance.pickset(['alpha', 'bravo', 'charlie', 'delta', 'echo'], 3);
+            const myArray = Chance.pickset(['alpha', 'bravo', 'charlie', 'delta', 'echo'], 3);
             return `http://petstore.io/${myArray[0]}/${myArray[1]}/${myArray[2]}.jpg`
         }
     }
 
 ];
+
+export default mixins;

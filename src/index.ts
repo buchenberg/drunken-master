@@ -1,12 +1,12 @@
 import { Server, Request, ResponseToolkit } from "@hapi/hapi";
 import Builder from "swaggerize-routes";
 import Xmock from "x-mock";
-import { specs } from "./oas";
 import Path from "path";
 import Glue from "@hapi/glue";
 import H2O2 from '@hapi/h2o2';
 import Inert from '@hapi/inert';
 import Vision from '@hapi/vision';
+import { hostname } from "os";
 
 const nyan = `
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -118,11 +118,16 @@ const environment = {
 // };
 
 const manifest = {
+    server: {
+        port: 3000,
+        host: "localhost"
+    },
     register: {
         plugins: [
             H2O2,
             Inert,
             Vision,
+            './mocks'
             // {
             //     plugin: './proxy',
             //     options: {
@@ -154,7 +159,7 @@ const manifest = {
 };
 
 const options = {
-    relativeTo: __dirname,
+    relativeTo: __dirname
 };
 
 const startServer = async function () {
@@ -167,23 +172,14 @@ const startServer = async function () {
                 return 'Hello World!';
             }
         });
-        // GET OAS METADATA
-        server.route({
-            method: 'GET',
-            path: '/oas',
-            handler: function () {
-                return specs.map((spec) => {
-                    return {
-                        "title": spec.title,
-                        "path": spec.docpath
-                    }
-                });
-            },
-        //vhost: options.vhost,
-        });
-
+        const today = new Date();
         await server.start();
-        console.log('hapi days!');
+        console.log(nyan);
+
+        console.log("Nyan! So much hapi.");
+        console.log();
+        console.log(today.toTimeString());
+        console.log('Server running on %s', server.info.uri);
     }
     catch (err) {
         console.error(err);

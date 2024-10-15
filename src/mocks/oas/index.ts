@@ -1,15 +1,15 @@
 import petstore from './petstore.json';
 import uberApi from './uber.json'
 
-export const specs = [
+export default [
     {
         "title": "Petstore API",
-        "docpath": "/docs/petstore",
+        "docpath": "/oas/petstore",
         "oas": petstore
     },
     {
         "title": "Uber API",
-        "docpath": "/docs/uber",
+        "docpath": "/oas/uber",
         "oas": uberApi
     }
 ]
