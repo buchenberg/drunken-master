@@ -1,7 +1,8 @@
 'use strict';
-const debug = require('debug')('proxy');
-const wreck = require('wreck');
-exports.register = function(server, options, next) {
+import debug from "debug";
+import wreck from "@hapi/wreck"
+
+export default function(server, options, next) {
     server.on('request-internal', (request, event, tags) => {
         if (tags.error && tags.state) {
             debug(`Error parsing cookie: ${JSON.stringify(event.data.errors, null, 2)}`);
@@ -49,7 +50,4 @@ exports.register = function(server, options, next) {
     });
 
     next();
-};
-exports.register.attributes = {
-    pkg: require('./package.json'),
 };
