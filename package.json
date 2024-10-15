@@ -62,8 +62,6 @@
         "dev-client": "cd lib/ui-next && npm start",
         "dev-server": "nodemon --inspect=5858 server.js",
         "prod-server": "npm run build-ui && npm start",
-        "test": "npm run dredd",
-        "dredd": "dredd",
         "lint": "eslint . --fix"
     },
     "main": "./server"
