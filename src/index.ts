@@ -120,40 +120,35 @@ const environment = {
 const manifest = {
     server: {
         port: 3000,
-        host: "localhost"
+        host: "localhost",
+        routes: {
+            files: {
+                relativeTo: __dirname
+            }
+        }
     },
     register: {
         plugins: [
             H2O2,
             Inert,
             Vision,
-            './mocks'
-            // {
-            //     plugin: './proxy',
-            //     options: {
-            //         upstream_protocol: process.env.PROXY_UPSTREAM_PROTOCOL || 'https',
-            //         upstream_url: process.env.PROXY_UPSTREAM_HOST || 'public.dev-spectrum.net',
-            //         proxy_host_header: process.env.PROXY_HOST_HEADER || 'figaro.dev-spectrum.net',
-            //     },
-            // },
-            // {
-            //     plugin: './mocks',
-            //     options: {
-            //         baseDir: Path.resolve('./mocks'),
-            //         docspath: '/docs',
-            //     },
-                
-            // },
-            // {
-            //     plugin: {
-            //         register: './lib/ui',
-            //         options: {
-            //             cors: {
-            //                 origin: ['*'],
-            //             },
-            //         },
-            //     },
-            // },
+            './mocks',
+            {
+                plugin: './proxy',
+                options: {
+                    upstream_protocol: process.env.PROXY_UPSTREAM_PROTOCOL || 'https',
+                    upstream_url: process.env.PROXY_UPSTREAM_HOST || 'google.com',
+                    proxy_host_header: process.env.PROXY_HOST_HEADER || 'google.com',
+                },
+            },
+            {
+                plugin: "./pub",
+                options: {
+                    cors: {
+                        origin: ['*'],
+                    },
+                },
+            },
         ]
     }
 };
@@ -162,16 +157,9 @@ const options = {
     relativeTo: __dirname
 };
 
-const startServer = async function () {
+const init = async function () {
     try {
         const server = await Glue.compose(manifest, options);
-        server.route({
-            method: 'GET',
-            path: '/',
-            handler: (request: Request, h: ResponseToolkit) => {
-                return 'Hello World!';
-            }
-        });
         const today = new Date();
         await server.start();
         console.log(nyan);
@@ -187,107 +175,4 @@ const startServer = async function () {
     }
 };
 
-startServer();
-
-// const routes = Builder({
-//     'baseDir': options.baseDir,
-//     'api': oas,
-//     'schema-extensions': true,
-//     'defaulthandler': function (request, reply) {
-//         let path = request.route.path.replace(oas.basePath, '');
-//         let mockOptions = {
-//             path: path,
-//             operation: request.method,
-//             response: '200',
-//         };
-//         let Mock = Xmock(oas, { 'mixins': Mixins });
-//         Mock.response(mockOptions)
-//             .then((mock) => {
-//                 if (mock) {
-//                     reply(mock);
-//                 } else {
-//                     reply({ 'drunken-master-error': 'no mock response found.' })
-//                     .code(500);
-//                 }
-//             }).catch((error) => {
-//                 reply({ 'drunken-master-error': error })
-//                 .code(500);
-//             });
-//     },
-// });
-
-// const startServer = function() {
-//     Glue.compose(manifest, options, (err, server) => {
-//         if (err) {
-//             throw err;
-//         }
-
-//         let today = new Date();
-
-//         server.start(() => {
-//             //server.plugins.mocks.setHost(server.info.host + ':' + server.info.port);
-//             console.log(`${nyan}
-//                 ** ${today.toTimeString()} **
-//                      Nyan! So much hapi.
-//                     `);
-//                     console.log(`Drunken Master is running on ${server.info.uri}`);
-//                     console.log('Static Routes:');
-//             let staticRoutes = server.table()[0].table;
-//             staticRoutes.forEach((route) => console.log(`\t${route.method}\t${route.path}`));
-//         });
-//     });
-// };
-
-// startServer();
-
-
-
-// const init = async () => {
-//     // specs.forEach(function (spec) {
-//     //     console.log(spec);
-//     // });
-//     const today = new Date();
-//     const server: Server = new Server({
-//         port: 3000,
-//         host: 'localhost'
-//     });
-//     server.route({
-//         method: 'GET',
-//         path: '/',
-//         handler: (request: Request, h: ResponseToolkit) => {
-//             return 'Hello World!';
-//         }
-//     });
-//     // GET OAS METADATA
-//     server.route({
-//         method: 'GET',
-//         path: '/oas',
-//         handler: function () {
-//             return specs.map((spec) => {
-//                 return {
-//                     "title": spec.title,
-//                     "path": spec.docpath
-//                 }
-//             });
-//         },
-//         //vhost: options.vhost,
-//     });
-
-
-//     await server.start();
-//     console.log(nyan);
-
-//     console.log("Nyan! So much hapi.");
-//     console.log();
-//     console.log(today.toTimeString());
-//     console.log('Server running on %s', server.info.uri);
-    
-// };
-
-// process.on('unhandledRejection', (err) => {
-//     console.log(err);
-//     process.exit(1);
-// });
-
-
-// init();
+init();

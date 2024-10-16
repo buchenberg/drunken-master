@@ -35,7 +35,7 @@ const mocksPlugin = {
                 // Build routes
                 const routes = Builder({
                     api: oas,
-                    handlers: './handlers',
+                    handlers: '.',
                     defaulthandler: async function (request) {
                         let path = request.route.path.replace(oas.basePath, '');
                         let mockOptions = {
@@ -56,6 +56,9 @@ const mocksPlugin = {
                         path: route.path,
                         vhost: options.vhost,
                         config: {
+                            json: {
+                                space: 2,
+                            },
                             handler: route.handler,
                             cors: options.cors,
                             // Needed for legacy cookies that violate RFC 6265
@@ -75,7 +78,6 @@ const mocksPlugin = {
         server.expose({
             specs: Oas
         });
-
 
         server.route({
             method: 'GET',
